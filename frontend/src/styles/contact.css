@@ -1,0 +1,125 @@
+.contact-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 80px 5%;
+}
+
+/* Overlay for readability */
+.contact-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  z-index: 1;
+}
+
+/* Container above overlay */
+.contact-container {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;  /* chhota kiya 700px → 600px */
+  width: 100%;
+  background-color: rgba(12, 18, 26, 0.5);
+  padding: 35px 30px; /* thoda kam padding */
+  border-radius: 20px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+
+.contact-header span {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #e7edf7;
+  font-weight: 600;
+}
+
+.contact-header h1 {
+  font-family: var(--font-display);
+  font-size: 48px;
+  margin: 15px 0 15px 0;
+  color: #ffffff;
+}
+
+.contact-header p {
+  font-size: 16px;
+  color: #d7e1ef;
+  line-height: 1.6;
+}
+
+.contact-form {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-error,
+.contact-success {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.contact-error {
+  color: #ffd6d6;
+  background: rgba(180, 30, 30, 0.35);
+  border: 1px solid rgba(255, 112, 112, 0.5);
+}
+
+.contact-success {
+  color: #d7ffe1;
+  background: rgba(22, 128, 74, 0.35);
+  border: 1px solid rgba(95, 218, 149, 0.5);
+}
+
+.contact-form .form-group input,
+.contact-form .form-group textarea {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  font-size: 14px;
+  font-family: var(--font-body);
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.94);
+  color: #111827;
+}
+
+.contact-form .form-group input:focus,
+.contact-form .form-group textarea:focus {
+  outline: none;
+  border-color: #408adf; /* moonstone */
+  box-shadow: 0 0 8px rgba(64, 138, 223, 0.3);
+}
+
+.contact-btn {
+  padding: 14px 34px;
+  border-radius: 30px;
+  background: linear-gradient(90deg, var(--rose-dust), var(--moonstone));
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.contact-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(64, 138, 223, 0.28);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-container {
+    padding: 40px 25px;
+  }
+
+  .contact-header h1 {
+    font-size: 36px;
+  }
+}

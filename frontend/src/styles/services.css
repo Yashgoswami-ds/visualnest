@@ -1,0 +1,146 @@
+.services {
+  background-color: var(--warm-sand);
+  padding: 120px 0;
+}
+
+[data-theme="light"] .services {
+  background-color: var(--warm-sand);
+}
+
+/* MAIN GRID */
+.services-layout {
+  max-width: 1400px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 35% 65%;
+  gap: 0;
+  align-items: center;
+}
+
+/* LEFT IMAGE */
+.services-bg {
+  height: 520px;
+  background-size: contain;   /* 🔥 PURI IMAGE DIKHEGI */
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* MOBILE */
+@media (max-width: 992px) {
+  .services-bg {
+    height: 320px;
+  }
+}
+
+
+
+
+/* RIGHT CONTENT */
+.services-container {
+  padding: 0 6%;
+  position: relative;
+  z-index: 2;
+}
+
+/* INTRO */
+.services-intro {
+  max-width: 680px;
+  margin-bottom: 80px;
+}
+
+.services-eyebrow {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--dusty-olive);
+  font-weight: 600;
+}
+
+.services-intro h1 {
+  font-size: 56px;
+  margin: 18px 0;
+  color: var(--soft-black);
+}
+
+.services-intro p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--dusty-olive);
+}
+
+/* LIST */
+.services-list {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+/* CARD */
+.service-item {
+  display: flex;
+  gap: 40px;
+  padding: 42px;
+  border-radius: 26px;
+  background: color-mix(in srgb, var(--ivory-white) 94%, transparent 6%);
+  border: 1px solid color-mix(in srgb, var(--soft-black) 8%, transparent 92%);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.service-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.service-no {
+  font-size: 44px;
+  color: rgba(0, 0, 0, 0.08);
+  min-width: 60px;
+}
+
+.service-content h3 {
+  font-size: 26px;
+  margin-bottom: 12px;
+  color: var(--soft-black);
+}
+
+.service-content p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--dusty-olive);
+  margin-bottom: 18px;
+}
+
+.service-content a {
+  font-size: 14px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  color: var(--moonstone);
+  text-decoration: none;
+}
+
+[data-theme="dark"] .service-item {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .services-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .services-bg {
+    height: 260px;
+    border-radius: 0;
+  }
+
+  .services-container {
+    padding: 60px 7% 0;
+  }
+
+  .services-intro h1 {
+    font-size: 42px;
+  }
+
+  .service-item {
+    flex-direction: column;
+  }
+}

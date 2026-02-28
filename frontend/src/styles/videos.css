@@ -1,0 +1,146 @@
+.videos-section {
+  background: var(--warm-sand);
+  padding: 140px 0;
+}
+
+.videos-intro {
+  max-width: 700px;
+  margin-bottom: 80px;
+}
+
+.videos-intro span {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--dusty-olive);
+  font-weight: 600;
+}
+
+.videos-intro h1 {
+  font-family: var(--font-display);
+  font-size: 52px;
+  margin: 18px 0;
+  color: var(--soft-black);
+}
+
+.videos-intro p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--dusty-olive);
+}
+
+.videos-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 50px;
+  justify-content: center;
+}
+
+.videos-category-btn {
+  padding: 12px 24px;
+  border: 2px solid color-mix(in srgb, var(--soft-black) 14%, transparent 86%);
+  border-radius: 30px;
+  background: color-mix(in srgb, var(--ivory-white) 95%, transparent 5%);
+  color: var(--soft-black);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.videos-category-btn:hover {
+  border-color: var(--soft-black);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+}
+
+.videos-category-btn.active {
+  background: var(--soft-black);
+  color: var(--ivory-white);
+  border-color: var(--soft-black);
+}
+
+.videos-empty {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 18px;
+  color: var(--dusty-olive);
+}
+
+.video-meta {
+  margin-top: 12px;
+}
+
+.video-meta h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--soft-black);
+}
+
+.video-meta p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--dusty-olive);
+}
+
+.videos-back-link-wrap {
+  margin-top: 36px;
+  text-align: center;
+}
+
+.videos-back-link {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 24px;
+  text-decoration: none;
+  background: var(--soft-black);
+  color: var(--ivory-white);
+  font-weight: 600;
+}
+
+.videos-load-more-wrap {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+}
+
+.videos-load-more {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: var(--soft-black);
+  color: var(--ivory-white);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.videos-load-more:hover {
+  opacity: 0.9;
+}
+
+[data-theme="dark"] .videos-category-btn {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 992px) {
+  .videos-intro h1 {
+    font-size: 42px;
+  }
+}
+
+@media (max-width: 576px) {
+  .videos-section {
+    padding: 90px 0;
+  }
+
+  .videos-intro {
+    margin-bottom: 50px;
+  }
+
+  .videos-intro h1 {
+    font-size: 34px;
+  }
+}

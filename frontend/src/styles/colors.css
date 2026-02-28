@@ -1,0 +1,111 @@
+:root {
+  --ivory-white: #fefcf9;        /* background */
+  --soft-black: #1c1c1c;         /* hero title */
+  --dusty-olive: #7a7f6a;        /* subtitle text */
+  --charcoal-black: #1c1c1c;     /* CTA button bg */
+  --rose-dust: #e65a7f;          /* hover / accent */
+  --moonstone: #408adf;          /* secondary accent */
+  --soft-white: #f5f5f5;         /* generic white text */
+  --warm-sand: #f4e8d4;          /* extra bg */
+}
+
+[data-theme="dark"] {
+  --ivory-white: #10131a;
+  --soft-black: #f3f5f7;
+  --dusty-olive: #a8b194;
+  --charcoal-black: #f3f5f7;
+  --rose-dust: #f0809d;
+  --moonstone: #6fb0f1;
+  --soft-white: #f5f5f5;
+  --warm-sand: #1a1f29;
+}
+
+/* Background utilities */
+.bg-ivory { background-color: var(--ivory-white); }
+.bg-charcoal { background-color: var(--charcoal-black); }
+.bg-sand { background-color: var(--warm-sand); }
+
+/* Text utilities */
+.text-soft-black { color: var(--soft-black); }
+.text-soft-white { color: var(--soft-white); }
+.text-olive { color: var(--dusty-olive); }
+.text-sand { color: var(--warm-sand); }
+
+/* Layout helpers */
+.min-h-screen { min-height: 100vh; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.gap-6 { gap: 1.5rem; }
+
+/* Typography */
+.font-cursive {
+  font-family: "Playfair Display", "Cormorant Garamond", serif;
+}
+
+/* Responsive Helpers */
+
+/* Flex Wrapping */
+.flex-wrap { flex-wrap: wrap; }
+
+/* Responsive Widths */
+.w-full { width: 100%; }
+.max-w-xs { max-width: 20rem; }
+.max-w-sm { max-width: 24rem; }
+.max-w-md { max-width: 28rem; }
+.max-w-lg { max-width: 32rem; }
+.max-w-xl { max-width: 36rem; }
+.max-w-2xl { max-width: 42rem; }
+.max-w-3xl { max-width: 48rem; }
+.max-w-4xl { max-width: 56rem; }
+.max-w-5xl { max-width: 64rem; }
+.max-w-6xl { max-width: 72rem; }
+
+/* Padding & Margin Responsive */
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+.p-8 { padding: 2rem; }
+.m-4 { margin: 1rem; }
+.m-6 { margin: 1.5rem; }
+.m-8 { margin: 2rem; }
+
+/* Responsive Typography */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-base { font-size: 1rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 1.875rem; }
+.text-4xl { font-size: 2.25rem; }
+.text-5xl { font-size: 3rem; }
+.text-6xl { font-size: 3.75rem; }
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+  .text-5xl { font-size: 2.5rem; }
+  .text-6xl { font-size: 3rem; }
+  .gap-6 { gap: 1.25rem; }
+}
+
+@media (max-width: 992px) {
+  .text-4xl { font-size: 2rem; }
+  .text-5xl { font-size: 2.25rem; }
+  .text-6xl { font-size: 2.5rem; }
+  .p-8 { padding: 1.5rem; }
+}
+
+@media (max-width: 768px) {
+  .text-3xl { font-size: 1.75rem; }
+  .text-4xl { font-size: 2rem; }
+  .text-5xl { font-size: 2.25rem; }
+  .gap-6 { gap: 1rem; }
+}
+
+@media (max-width: 576px) {
+  .text-2xl { font-size: 1.5rem; }
+  .text-3xl { font-size: 1.75rem; }
+  .p-6 { padding: 1rem; }
+  .gap-6 { gap: 0.75rem; }
+}
