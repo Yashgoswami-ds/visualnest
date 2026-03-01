@@ -13,16 +13,22 @@ import java.time.Instant;
 @Configuration
 public class DataInitializer {
 
-  @Value("${app.admin.email:admin@photfolio.com}")
+  @Value("${app.admin.email:}")
   private String defaultAdminEmail;
 
-  @Value("${app.admin.password:admin123}")
+  @Value("${app.admin.password:}")
   private String defaultAdminPassword;
 
   @Bean
   public CommandLineRunner initializeData(UserRepository userRepository, PasswordEncoder passwordEncoder) {
     return args -> {
       try {
+        if (defaultAdminEmail == null || defaultAdminEmail.isBlank() ||
+            defaultAdminPassword == null || defaultAdminPassword.isBlank()) {
+          System.out.println("\nℹ️ Admin seed skipped (APP_ADMIN_EMAIL / APP_ADMIN_PASSWORD not set).\n");
+          return;
+        }
+
         String normalizedAdminEmail = defaultAdminEmail.trim().toLowerCase();
 
         if (!userRepository.existsByEmail(normalizedAdminEmail)) {
@@ -37,17 +43,6 @@ public class DataInitializer {
 
           System.out.println("\n✅ Super admin user created:");
           System.out.println("   Super Admin Email: " + defaultAdminEmail + " | Password: " + defaultAdminPassword + "\n");
-        } else {
-          User existingAdmin = userRepository.findByEmail(normalizedAdminEmail).orElse(null);
-          if (existingAdmin != null) {
-            existingAdmin.setEnabled(true);
-            existingAdmin.setRole(User.ROLE_SUPER_ADMIN);
-            existingAdmin.setApprovalStatus(User.APPROVAL_APPROVED);
-            if (existingAdmin.getApprovedAt() == null) {
-              existingAdmin.setApprovedAt(Instant.now());
-            }
-            userRepository.save(existingAdmin);
-          }
         }
       } catch (Exception e) {
         e.printStackTrace();
