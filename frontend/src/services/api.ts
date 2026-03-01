@@ -35,16 +35,20 @@ export const API_URL =
     : "/api";
 
 const resolveApiOrigin = (): string | null => {
-  if (API_URL.startsWith("http://") || API_URL.startsWith("https://")) {
-    try {
-      return new URL(API_URL).origin;
-    } catch {
-      return null;
-    }
-  }
+  const candidates = [configuredApiUrl, API_URL, import.meta.env.VITE_BACKEND_URL?.trim()].filter(
+    (value): value is string => Boolean(value)
+  );
 
-  if (typeof window !== "undefined") {
-    return window.location.origin;
+  for (const candidate of candidates) {
+    if (!(candidate.startsWith("http://") || candidate.startsWith("https://"))) {
+      continue;
+    }
+
+    try {
+      return new URL(candidate).origin;
+    } catch {
+      // try next candidate
+    }
   }
 
   return null;
@@ -53,8 +57,20 @@ const resolveApiOrigin = (): string | null => {
 export const normalizeMediaUrl = (url: string): string => {
   if (!url) return url;
 
+  const apiOrigin = resolveApiOrigin();
+
+  if (/^https?:\/\//i.test(url)) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.pathname.startsWith("/uploads/") && apiOrigin) {
+        return `${apiOrigin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+    } catch {
+      return url;
+    }
+  }
+
   if (url.startsWith("/uploads/")) {
-    const apiOrigin = resolveApiOrigin();
     if (apiOrigin) {
       return `${apiOrigin}${url}`;
     }

@@ -14,47 +14,6 @@ type GalleryMedia = {
 };
 
 const Gallery = () => {
-  const hiddenGalleryCategories = new Set([
-    "about-profile",
-    "home-first",
-    "about-video",
-    "background",
-    "admin",
-    "admin-photo",
-    "admin-video",
-  ]);
-  const hiddenGalleryPrefixes = ["admin-"];
-  const isHiddenGalleryCategory = (value: string) => {
-    const normalized = (value || "").trim().toLowerCase();
-    if (!normalized) {
-      return false;
-    }
-    if (hiddenGalleryCategories.has(normalized)) {
-      return true;
-    }
-    if (normalized.endsWith("-bg")) {
-      return true;
-    }
-    return hiddenGalleryPrefixes.some((prefix) => normalized.startsWith(prefix));
-  };
-
-  const isHiddenGalleryMedia = (item: Image) => {
-    if (isHiddenGalleryCategory(item.category || "")) {
-      return true;
-    }
-
-    const kind = (item.mediaKind || "").trim().toLowerCase();
-    if (kind === "background") {
-      return true;
-    }
-
-    const section = (item.section || "").trim().toLowerCase();
-    if (section === "admin" || section === "background") {
-      return true;
-    }
-
-    return false;
-  };
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "all";
 
@@ -65,7 +24,6 @@ const Gallery = () => {
   const categoryOptions = [
     { id: "all", label: "All Media" },
     ...getAdminCategories()
-      .filter((item) => !isHiddenGalleryCategory(item.value))
       .map((item) => ({ id: item.value, label: item.label })),
   ];
 
@@ -76,8 +34,7 @@ const Gallery = () => {
         const response = selectedCategory === "all"
           ? await fetchImages() 
           : await fetchImagesByCategory(selectedCategory);
-        const filtered = response.filter((item) => !isHiddenGalleryMedia(item));
-        setDbImages(filtered);
+        setDbImages(response);
       } catch (error) {
         console.error("Failed to load gallery images", error);
       } finally {
@@ -151,7 +108,7 @@ const Gallery = () => {
                   className="gallery-load-more"
                   onClick={() => setVisibleCount((prev) => prev + 10)}
                 >
-                  +
+                  <span className="gallery-load-more-text">Load More</span>
                 </button>
               </div>
             )}

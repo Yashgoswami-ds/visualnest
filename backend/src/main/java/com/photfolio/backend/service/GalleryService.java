@@ -139,6 +139,12 @@ public class GalleryService {
     for (ImageDto record : records) {
       boolean changed = false;
 
+      String canonicalUrl = canonicalizeUploadUrl(record.getUrl());
+      if (!Objects.equals(canonicalUrl, record.getUrl())) {
+        record.setUrl(canonicalUrl);
+        changed = true;
+      }
+
       if (record.getMediaKind() == null || record.getMediaKind().isBlank()) {
         record.setMediaKind(resolveMediaKind(record.getMediaType()));
         changed = true;
@@ -163,9 +169,74 @@ public class GalleryService {
         record = imageRepository.save(record);
       }
 
+      if (!isMediaFileAvailable(record.getUrl())) {
+        continue;
+      }
+
       normalized.add(record);
     }
     return normalized;
+  }
+
+  private String canonicalizeUploadUrl(String url) {
+    String raw = url == null ? "" : url.trim();
+    if (raw.isEmpty() || raw.startsWith("/uploads/")) {
+      return raw;
+    }
+
+    try {
+      java.net.URI uri = java.net.URI.create(raw);
+      String path = uri.getPath();
+      if (path != null && path.startsWith("/uploads/")) {
+        String query = uri.getQuery();
+        String fragment = uri.getFragment();
+        StringBuilder output = new StringBuilder(path);
+        if (query != null && !query.isBlank()) {
+          output.append("?").append(query);
+        }
+        if (fragment != null && !fragment.isBlank()) {
+          output.append("#").append(fragment);
+        }
+        return output.toString();
+      }
+    } catch (Exception ignored) {
+      // keep original if not a parsable absolute url
+    }
+
+    return raw;
+  }
+
+  private boolean isMediaFileAvailable(String url) {
+    String mediaUrl = url == null ? "" : url.trim();
+    if (!mediaUrl.startsWith("/uploads/")) {
+      return true;
+    }
+
+    String fileName = mediaUrl.substring("/uploads/".length());
+    int queryIndex = fileName.indexOf('?');
+    if (queryIndex >= 0) {
+      fileName = fileName.substring(0, queryIndex);
+    }
+
+    int hashIndex = fileName.indexOf('#');
+    if (hashIndex >= 0) {
+      fileName = fileName.substring(0, hashIndex);
+    }
+
+    if (fileName.isBlank()) {
+      return false;
+    }
+
+    try {
+      Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+      Path mediaPath = uploadPath.resolve(fileName).normalize();
+      if (!mediaPath.startsWith(uploadPath)) {
+        return false;
+      }
+      return Files.exists(mediaPath);
+    } catch (Exception ignored) {
+      return false;
+    }
   }
 
   private String resolveMediaKind(String mediaType) {

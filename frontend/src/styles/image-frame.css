@@ -11,6 +11,10 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.image-frame.quick-view-enabled {
+  cursor: zoom-in;
+}
+
 .image-frame:hover {
   transform: translateY(-3px);
   box-shadow: 0 15px 30px rgba(0,0,0,0.25);
@@ -89,6 +93,97 @@
   flex-shrink: 0;
 }
 
+.image-quick-view {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: color-mix(in srgb, var(--soft-black) 28%, transparent 72%);
+  backdrop-filter: blur(14px) saturate(140%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  animation: imageQuickViewFadeIn 0.35s ease;
+}
+
+.image-quick-view-content {
+  width: auto;
+  max-width: 88vw;
+  max-height: 86vh;
+  border-radius: 16px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ivory-white) 14%, transparent 86%);
+  border: 1px solid color-mix(in srgb, var(--ivory-white) 28%, transparent 72%);
+  box-shadow: 0 24px 56px color-mix(in srgb, var(--soft-black) 45%, transparent 55%);
+  animation: imageQuickViewScaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.image-quick-view-media {
+  width: auto;
+  height: auto;
+  max-width: 88vw;
+  max-height: 86vh;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+}
+
+.image-quick-view-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid color-mix(in srgb, var(--ivory-white) 42%, transparent 58%);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--soft-black) 58%, transparent 42%);
+  backdrop-filter: blur(10px);
+  color: var(--ivory-white);
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--soft-black) 30%, transparent 70%);
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.image-quick-view-close svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.image-quick-view-close:hover {
+  transform: scale(1.06);
+  background: color-mix(in srgb, var(--soft-black) 38%, transparent 62%);
+  border-color: color-mix(in srgb, var(--ivory-white) 70%, transparent 30%);
+}
+
+.image-quick-view-close:active {
+  transform: scale(0.96);
+}
+
+@keyframes imageQuickViewFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes imageQuickViewScaleIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Responsive Adjustments */
 
 /* Tablets */
@@ -128,5 +223,32 @@
   .image-overlay-icon {
     width: 13px;
     height: 13px;
+  }
+
+  .image-quick-view {
+    padding: 14px;
+  }
+
+  .image-quick-view-content {
+    max-width: 94vw;
+    max-height: 82vh;
+    border-radius: 12px;
+  }
+
+  .image-quick-view-media {
+    max-width: 94vw;
+    max-height: 82vh;
+  }
+
+  .image-quick-view-close {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .image-quick-view-close svg {
+    width: 18px;
+    height: 18px;
   }
 }
