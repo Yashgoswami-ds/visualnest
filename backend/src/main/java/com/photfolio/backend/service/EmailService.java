@@ -130,8 +130,7 @@ public class EmailService {
   public void sendPasswordResetEmail(String email, String resetLink) {
     try {
       if (mailSender == null) {
-        System.out.println("Email service not configured. Reset link: " + resetLink);
-        return;
+        throw new RuntimeException("Email service is not configured on server");
       }
 
       String body = "<p style=\"margin:0 0 14px;font-size:14px;color:#475569;\">Use the button below to reset your password.</p>"
@@ -152,7 +151,11 @@ public class EmailService {
           null
       );
     } catch (Exception e) {
-      System.out.println("Failed to send email: " + e.getMessage());
+      String reason = safe(e.getMessage());
+      if (reason.isEmpty()) {
+        reason = e.getClass().getSimpleName();
+      }
+      throw new RuntimeException("Failed to send password reset email: " + reason);
     }
   }
 
