@@ -13,6 +13,8 @@ WORKDIR /app
 COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar app.jar
 
 ENV JAVA_OPTS=""
+ENV APP_STORAGE_UPLOAD_DIR="/data/photfolio-uploads"
+VOLUME ["/data"]
 EXPOSE 8081
 
 CMD ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8081} -jar app.jar"]

@@ -46,7 +46,7 @@ app:
     secret: ${JWT_SECRET}
     ttlMinutes: 120
   storage:
-    uploadDir: "${user.home}/photfolio-uploads"
+    uploadDir: ${APP_STORAGE_UPLOAD_DIR:${user.home}/photfolio-uploads}
   cors:
     allowedOrigins:
       - "http://localhost:5173"
