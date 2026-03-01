@@ -9,7 +9,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: goswamiyash289@gmail.com
+    username: ${MAIL_USERNAME:}
     password: ${MAIL_APP_PASSWORD:}
     properties:
       mail:
@@ -34,11 +34,13 @@ springdoc:
     enabled: true
 
 app:
+  baseUrl: ${APP_BASE_URL:}
+  frontendBaseUrl: ${APP_FRONTEND_BASE_URL:http://localhost:5173}
   admin:
-    email: goswamiyash289@gmail.com
-    password: admin123
+    email: ${APP_ADMIN_EMAIL:}
+    password: ${APP_ADMIN_PASSWORD:}
   jwt:
-    secret: "change-this-secret-to-a-long-random-string-please"
+    secret: ${JWT_SECRET}
     ttlMinutes: 120
   storage:
     uploadDir: "${user.home}/photfolio-uploads"
@@ -46,7 +48,10 @@ app:
     allowedOrigins:
       - "http://localhost:5173"
       - "http://127.0.0.1:5173"
+      - "https://visualnest.vercel.app"
+      - "https://www.visualnest.vercel.app"
+      - "https://*.vercel.app"
 
 jwt:
-  secret: mySecretKeyForPhotfolioApplicationThatIsAtLeast32CharactersLong-ExtraSecureKey
+  secret: ${JWT_SECRET}
   expiration: 86400000

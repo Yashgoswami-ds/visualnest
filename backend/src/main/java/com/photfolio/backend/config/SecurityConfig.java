@@ -2,6 +2,7 @@ package com.photfolio.backend.config;
 
 import com.photfolio.backend.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,11 +20,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+  @Value("${app.cors.allowedOrigins:http://localhost:5173,http://127.0.0.1:5173,https://visualnest.vercel.app,https://www.visualnest.vercel.app,https://*.vercel.app}")
+  private List<String> allowedOrigins;
 
   @Autowired
   private CustomUserDetailsService userDetailsService;
@@ -73,28 +79,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(Arrays.asList(
-        "http://localhost:*",
-      "http://127.0.0.1:*",
-      "http://192.168.*:*",
-      "http://10.*:*",
-      "http://172.16.*:*",
-      "http://172.17.*:*",
-      "http://172.18.*:*",
-      "http://172.19.*:*",
-      "http://172.20.*:*",
-      "http://172.21.*:*",
-      "http://172.22.*:*",
-      "http://172.23.*:*",
-      "http://172.24.*:*",
-      "http://172.25.*:*",
-      "http://172.26.*:*",
-      "http://172.27.*:*",
-      "http://172.28.*:*",
-      "http://172.29.*:*",
-      "http://172.30.*:*",
-      "http://172.31.*:*"
-    ));
+    configuration.setAllowedOriginPatterns(new ArrayList<>(allowedOrigins));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("*"));
     configuration.setAllowCredentials(true);

@@ -7,6 +7,7 @@ import com.photfolio.backend.model.RegistrationPasswordSetupRequest;
 import com.photfolio.backend.model.User;
 import com.photfolio.backend.repository.AdminAccessSettingsRepository;
 import com.photfolio.backend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +24,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
+
+  @Value("${app.frontendBaseUrl:http://localhost:5173}")
+  private String frontendBaseUrl;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
@@ -552,7 +556,11 @@ public class AuthService {
     }
     User user = getUserOrThrow(normalizedEmail);
     String token = jwtTokenProvider.generateToken(normalizedEmail, user.getSessionVersion(), PASSWORD_RESET_LINK_TTL_MILLIS);
-    String resetLink = "http://localhost:5173/reset-password?token=" + token;
+    String normalizedFrontendBase = frontendBaseUrl == null ? "" : frontendBaseUrl.trim();
+    if (normalizedFrontendBase.endsWith("/")) {
+      normalizedFrontendBase = normalizedFrontendBase.substring(0, normalizedFrontendBase.length() - 1);
+    }
+    String resetLink = normalizedFrontendBase + "/reset-password?token=" + token;
     emailService.sendPasswordResetEmail(normalizedEmail, resetLink);
   }
 

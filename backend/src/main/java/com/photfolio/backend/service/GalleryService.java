@@ -23,7 +23,7 @@ public class GalleryService {
   @Value("${app.storage.uploadDir}")
   private String uploadDir;
 
-  @Value("${app.baseUrl:http://localhost:8081}")
+  @Value("${app.baseUrl:}")
   private String appBaseUrl;
 
   public GalleryService() {
@@ -126,7 +126,7 @@ public class GalleryService {
       imageDto.setSection(resolveSection(imageDto.getCategory()));
       imageDto.setCreatedAt(Instant.now());
       imageDto.setUpdatedAt(Instant.now());
-      imageDto.setUrl(appBaseUrl + "/uploads/" + storedName);
+      imageDto.setUrl(buildPublicUploadUrl(storedName));
 
       return imageRepository.save(imageDto);
     } catch (Exception e) {
@@ -174,6 +174,24 @@ public class GalleryService {
       return "video";
     }
     return "image";
+  }
+
+  private String buildPublicUploadUrl(String storedName) {
+    String safeName = storedName == null ? "" : storedName.trim();
+    if (safeName.isEmpty()) {
+      return "/uploads/";
+    }
+
+    String base = appBaseUrl == null ? "" : appBaseUrl.trim();
+    if (base.isEmpty()) {
+      return "/uploads/" + safeName;
+    }
+
+    if (base.endsWith("/")) {
+      base = base.substring(0, base.length() - 1);
+    }
+
+    return base + "/uploads/" + safeName;
   }
 
   private String resolveSection(String category) {
