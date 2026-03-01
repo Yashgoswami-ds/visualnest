@@ -56,7 +56,7 @@ public class EmailService {
     return "<a href=\""
         + escapeHtml(url)
         + "\" style=\"display:inline-block;background:#1d4ed8;color:#ffffff !important;text-decoration:none;font-size:14px;font-weight:700;padding:11px 18px;border-radius:10px;\">"
-        + escapeHtml(label)
+      + escapeHtml(label)
         + "</a>";
   }
 
@@ -176,7 +176,11 @@ public class EmailService {
           null
       );
     } catch (Exception e) {
-      throw new RuntimeException("Failed to send password reset OTP email. Check mail configuration.");
+      String reason = safe(e.getMessage());
+      if (reason.isEmpty()) {
+        reason = e.getClass().getSimpleName();
+      }
+      throw new RuntimeException("Failed to send password reset OTP email: " + reason);
     }
   }
 
@@ -226,7 +230,11 @@ public class EmailService {
           null
       );
     } catch (Exception e) {
-      throw new RuntimeException("Failed to send OTP email. Check mail configuration.");
+      String reason = safe(e.getMessage());
+      if (reason.isEmpty()) {
+        reason = e.getClass().getSimpleName();
+      }
+      throw new RuntimeException("Failed to send OTP email: " + reason);
     }
   }
 
@@ -250,7 +258,11 @@ public class EmailService {
           null
       );
     } catch (Exception e) {
-      throw new RuntimeException("Failed to send login OTP email. Check mail configuration.");
+      String reason = safe(e.getMessage());
+      if (reason.isEmpty()) {
+        reason = e.getClass().getSimpleName();
+      }
+      throw new RuntimeException("Failed to send login OTP email: " + reason);
     }
   }
 
