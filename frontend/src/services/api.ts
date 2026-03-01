@@ -34,8 +34,31 @@ export const API_URL =
     ? normalizeApiBaseUrl(configuredApiUrl)
     : "/api";
 
+const resolveApiOrigin = (): string | null => {
+  if (API_URL.startsWith("http://") || API_URL.startsWith("https://")) {
+    try {
+      return new URL(API_URL).origin;
+    } catch {
+      return null;
+    }
+  }
+
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+
+  return null;
+};
+
 export const normalizeMediaUrl = (url: string): string => {
   if (!url) return url;
+
+  if (url.startsWith("/uploads/")) {
+    const apiOrigin = resolveApiOrigin();
+    if (apiOrigin) {
+      return `${apiOrigin}${url}`;
+    }
+  }
 
   if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(url)) {
     try {
