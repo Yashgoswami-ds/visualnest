@@ -14,6 +14,51 @@ type GalleryMedia = {
 };
 
 const Gallery = () => {
+  const privateGalleryCategories = new Set([
+    "about-profile",
+    "home-first",
+    "about-video",
+    "background",
+    "admin",
+    "admin-photo",
+    "admin-video",
+  ]);
+
+  const isPrivateGalleryCategory = (value: string) => {
+    const normalized = (value || "").trim().toLowerCase();
+    if (!normalized) {
+      return false;
+    }
+
+    if (privateGalleryCategories.has(normalized)) {
+      return true;
+    }
+
+    if (normalized.startsWith("admin-") || normalized.endsWith("-bg")) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const isPrivateGalleryMedia = (item: Image) => {
+    if (isPrivateGalleryCategory(item.category || "")) {
+      return true;
+    }
+
+    const kind = (item.mediaKind || "").trim().toLowerCase();
+    if (kind === "background") {
+      return true;
+    }
+
+    const section = (item.section || "").trim().toLowerCase();
+    if (section === "admin" || section === "background") {
+      return true;
+    }
+
+    return false;
+  };
+
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "all";
 
@@ -24,6 +69,7 @@ const Gallery = () => {
   const categoryOptions = [
     { id: "all", label: "All Media" },
     ...getAdminCategories()
+      .filter((item) => !isPrivateGalleryCategory(item.value))
       .map((item) => ({ id: item.value, label: item.label })),
   ];
 
@@ -34,7 +80,8 @@ const Gallery = () => {
         const response = selectedCategory === "all"
           ? await fetchImages() 
           : await fetchImagesByCategory(selectedCategory);
-        setDbImages(response);
+        const filtered = response.filter((item) => !isPrivateGalleryMedia(item));
+        setDbImages(filtered);
       } catch (error) {
         console.error("Failed to load gallery images", error);
       } finally {
