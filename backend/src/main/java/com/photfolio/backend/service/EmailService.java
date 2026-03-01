@@ -353,8 +353,7 @@ public class EmailService {
   public void sendContactQueryToAdmin(String name, String email, String userMessage) {
     try {
       if (mailSender == null) {
-        System.err.println("Contact query email skipped: mail sender is not configured.");
-        return;
+        throw new RuntimeException("Email service is not configured on server");
       }
 
       String safeAdminEmail = safe(adminEmail);
@@ -371,8 +370,7 @@ public class EmailService {
 
       List<String> recipients = new ArrayList<>(recipientSet);
       if (recipients.isEmpty()) {
-        System.err.println("Contact query email skipped: no recipient configured.");
-        return;
+        throw new RuntimeException("No recipient configured for contact query email");
       }
 
       String safeName = escapeHtml(name);
@@ -406,14 +404,10 @@ public class EmailService {
       );
 
       if (!safeReplyTo.isEmpty()) {
-        try {
-          sendContactQueryAcknowledgement(safeReplyTo, safe(name));
-        } catch (Exception ackException) {
-          System.err.println("Failed to send contact acknowledgement email: " + ackException.getMessage());
-        }
+        sendContactQueryAcknowledgement(safeReplyTo, safe(name));
       }
     } catch (Exception e) {
-      System.err.println("Failed to send contact query email: " + e.getMessage());
+      throw new RuntimeException("Failed to send contact query email: " + e.getMessage());
     }
   }
 
