@@ -1,59 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/admin.css";
-import { fetchImagesByCategory, loginAdmin, normalizeMediaUrl } from "../services/api";
-import type { Image } from "../types/Image";
+import { loginAdmin } from "../services/api";
+import { useAdminAuthBackground } from "../hooks/useAdminAuthBackground";
 
 const AdminLogin = () => {
-  const LOGIN_BG_CATEGORY = "admin-login-bg";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
-  const [loginBgUrl, setLoginBgUrl] = useState<string>("/uploads/aglogin.jpg");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadLoginBackground = async () => {
-      try {
-        const media = await fetchImagesByCategory(LOGIN_BG_CATEGORY);
-        const imagesOnly = media.filter((item: Image) => (item.mediaKind || "image") === "image");
-
-        if (!imagesOnly.length || !mounted) {
-          return;
-        }
-
-        const latest = [...imagesOnly].sort((a, b) => {
-          const aTime = new Date(a.updatedAt || a.createdAt || 0).getTime();
-          const bTime = new Date(b.updatedAt || b.createdAt || 0).getTime();
-          return bTime - aTime;
-        })[0];
-
-        if (!latest?.url) {
-          return;
-        }
-
-        setLoginBgUrl(normalizeMediaUrl(latest.url));
-      } catch {
-      }
-    };
-
-    loadLoginBackground();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const loginBgStyle = useMemo(() => {
-    const separator = loginBgUrl.includes("?") ? "&" : "?";
-    return {
-      backgroundImage: `url(${loginBgUrl}${separator}v=${Date.now()})`,
-    };
-  }, [loginBgUrl]);
+  const loginBgStyle = useAdminAuthBackground(["admin-login-bg"]);
   
 // AdminLogin.tsx
 

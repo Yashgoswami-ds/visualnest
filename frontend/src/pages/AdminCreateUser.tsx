@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/admin.css";
 import { sendRegistrationOtp, verifyRegistrationOtp } from "../services/api";
+import { useAdminAuthBackground } from "../hooks/useAdminAuthBackground";
 
 const AdminCreateUser = () => {
   const navigate = useNavigate();
+  const authBgStyle = useAdminAuthBackground(["admin-login-bg"]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -93,7 +95,7 @@ const AdminCreateUser = () => {
   };
 
   return (
-    <div className="admin-login-page">
+    <div className="admin-login-page" style={authBgStyle}>
       <div className="admin-container">
         <h2 className="login-title">New User Registration</h2>
 

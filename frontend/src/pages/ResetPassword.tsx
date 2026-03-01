@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import "../styles/admin.css";
 import { resetPassword, resetPasswordWithOtp } from "../services/api";
+import { useAdminAuthBackground } from "../hooks/useAdminAuthBackground";
 
 const ResetPassword = () => {
+  const authBgStyle = useAdminAuthBackground(["admin-login-bg"]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -53,7 +55,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="admin-login-page">
+    <div className="admin-login-page" style={authBgStyle}>
       <div className="admin-container">
         <h2 className="login-title">Reset Password</h2>
         {error && <p className="login-error">{error}</p>}

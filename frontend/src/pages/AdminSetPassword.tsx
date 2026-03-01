@@ -2,8 +2,10 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/admin.css";
 import { setRegistrationPassword } from "../services/api";
+import { useAdminAuthBackground } from "../hooks/useAdminAuthBackground";
 
 const AdminSetPassword = () => {
+  const authBgStyle = useAdminAuthBackground(["admin-login-bg"]);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialEmail = useMemo(() => searchParams.get("email")?.trim() || "", [searchParams]);
@@ -55,7 +57,7 @@ const AdminSetPassword = () => {
   };
 
   return (
-    <div className="admin-login-page">
+    <div className="admin-login-page" style={authBgStyle}>
       <div className="admin-container">
         <h2 className="login-title">Set Password</h2>
 

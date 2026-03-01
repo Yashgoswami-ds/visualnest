@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/admin.css";
 import {
   approveAccessRequest,
@@ -33,6 +34,7 @@ import type { Image } from "../types/Image";
 import { type AdminCategory, getAdminCategories, saveAdminCategories, slugifyCategory } from "../utils/categories";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const HOME_FIRST_CATEGORY = "home-first";
   const ABOUT_PROFILE_CATEGORY = "about-profile";
   const MAX_IMAGE_MB = 2;
@@ -263,9 +265,9 @@ const AdminDashboard = () => {
     },
     {
       id: "admin-login-bg",
-      label: "Admin Login Background",
+      label: "Login Background",
       value: "admin-login-bg",
-      desc: "Background for admin login / access / forgot password pages",
+      desc: "Single background for login, create user, access request, forgot/reset password pages",
     },
     {
       id: "contact-bg",
@@ -305,7 +307,7 @@ const AdminDashboard = () => {
  const logout = () => {
   localStorage.removeItem("adminToken");
   localStorage.removeItem("adminAuth");
-  window.location.href = "/";
+  navigate("/", { replace: true });
 };
 
   const getEmailFromToken = () => {
@@ -485,7 +487,7 @@ const AdminDashboard = () => {
     const forceLogout = () => {
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminAuth");
-      window.location.href = "/admin-login";
+      navigate("/admin-login", { replace: true });
     };
 
     const verifyActiveSession = async () => {
@@ -511,7 +513,7 @@ const AdminDashboard = () => {
       isMounted = false;
       window.clearInterval(interval);
     };
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (!message) return;
