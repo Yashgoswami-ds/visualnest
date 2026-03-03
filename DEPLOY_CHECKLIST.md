@@ -1,4 +1,4 @@
-# Photfolio Deploy Checklist (Frontend + Backend)
+# Visualnest Deploy Checklist (Frontend + Backend)
 
 Use this checklist every time before deployment.
 

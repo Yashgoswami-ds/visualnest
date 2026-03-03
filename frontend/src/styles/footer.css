@@ -17,13 +17,17 @@
 /* BRAND */
 .footer-brand h2 {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   margin-bottom: 16px;
   color: var(--soft-black);
 }
 
 .footer-brand p {
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
   line-height: 1.7;
   color: var(--dusty-olive);
 }
@@ -31,8 +35,10 @@
 /* LINKS */
 .footer-links h4,
 .footer-contact h4 {
-  font-size: 14px;
-  letter-spacing: 2px;
+  font-size: 12px;
+  letter-spacing: 2.2px;
+  font-weight: 700;
+  text-transform: uppercase;
   margin-bottom: 20px;
   color: var(--dusty-olive);
 }
@@ -42,6 +48,8 @@
   text-decoration: none;
   color: var(--soft-black);
   font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
   margin-bottom: 12px;
   transition: color 0.3s ease;
 }

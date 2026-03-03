@@ -5,7 +5,7 @@ export type AdminCategory = {
   desc: string;
 };
 
-const STORAGE_KEY = "photfolio.admin.categories";
+const STORAGE_KEY = "visualnest.admin.categories";
 
 const defaults: AdminCategory[] = [
   {

@@ -63,7 +63,7 @@ public class SecurityConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider())
         .authorizeHttpRequests(auth -> auth
-          .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/verify-login-otp", "/api/auth/register", "/api/auth/request-access", "/api/auth/request-access-existing", "/api/auth/forgot-password", "/api/auth/forgot-password-otp", "/api/auth/reset-password", "/api/auth/reset-password-otp", "/api/auth/send-registration-otp", "/api/auth/verify-registration-otp", "/api/auth/set-registration-password", "/api/contact/query").permitAll()
+          .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/verify-login-otp", "/api/auth/register", "/api/auth/request-access", "/api/auth/request-access-existing", "/api/auth/check-email", "/api/auth/forgot-password", "/api/auth/forgot-password-otp", "/api/auth/reset-password", "/api/auth/reset-password-otp", "/api/auth/send-registration-otp", "/api/auth/verify-registration-otp", "/api/auth/set-registration-password", "/api/contact/query").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/gallery/**").permitAll()
           .requestMatchers(HttpMethod.GET, "/api/content/about").permitAll()
           .requestMatchers(HttpMethod.GET, "/api/content/contact").permitAll()

@@ -203,6 +203,14 @@ public class AuthService {
     }
   }
 
+  public boolean isEmailRegistered(String email) {
+    String normalizedEmail = normalizeEmail(email);
+    if (normalizedEmail.isBlank()) {
+      throw new RuntimeException("Email is required");
+    }
+    return userDetailsService.userExists(normalizedEmail);
+  }
+
   public LoginResponse verifyLoginOtp(String email, String otp) {
     String normalizedEmail = normalizeEmail(email);
     PendingLogin pendingLogin = pendingLogins.get(normalizedEmail);

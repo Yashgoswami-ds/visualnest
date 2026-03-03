@@ -73,9 +73,9 @@ const AdminDashboard = () => {
   const [savingAboutContent, setSavingAboutContent] = useState(false);
   const [contactContent, setContactContent] = useState<ContactContent>({
     location: "Delhi, India",
-    email: "hello@photoportfolio.com",
+    email: "hello@visualnest.com",
     phone: "+91 9XXXXXXXXX",
-    instagram: "https://instagram.com/photoportfolio",
+    instagram: "https://instagram.com/visualnest",
   });
   const [savingContactContent, setSavingContactContent] = useState(false);
   const [deletingContactContent, setDeletingContactContent] = useState(false);
@@ -469,9 +469,9 @@ const AdminDashboard = () => {
       } catch {
         setContactContent({
           location: "Delhi, India",
-          email: "hello@photoportfolio.com",
+          email: "hello@visualnest.com",
           phone: "+91 9XXXXXXXXX",
-          instagram: "https://instagram.com/photoportfolio",
+          instagram: "https://instagram.com/visualnest",
         });
       }
     };

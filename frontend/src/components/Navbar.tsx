@@ -15,7 +15,7 @@ const Navbar = () => {
       <header className="navbar">
         <div className="navbar-container">
           {/* Logo */}
-          <div className="logo">PhotoPortfolio</div>
+          <div className="logo">Visualnest</div>
 
           {/* Desktop Menu */}
           <nav className="nav-links desktop-only">

@@ -12,9 +12,9 @@ const Footer = ({ theme, onToggleTheme }: FooterProps) => {
   const [profileName, setProfileName] = useState("Admin");
   const [contactContent, setContactContent] = useState<ContactContent>({
     location: "Delhi, India",
-    email: "hello@photoportfolio.com",
+    email: "hello@visualnest.com",
     phone: "+91 9XXXXXXXXX",
-    instagram: "https://instagram.com/photoportfolio",
+    instagram: "https://instagram.com/visualnest",
   });
 
   const loadContactContent = async () => {
@@ -24,9 +24,9 @@ const Footer = ({ theme, onToggleTheme }: FooterProps) => {
     } catch {
       setContactContent({
         location: "Delhi, India",
-        email: "hello@photoportfolio.com",
+        email: "hello@visualnest.com",
         phone: "+91 9XXXXXXXXX",
-        instagram: "https://instagram.com/photoportfolio",
+        instagram: "https://instagram.com/visualnest",
       });
     }
   };
@@ -77,7 +77,7 @@ const Footer = ({ theme, onToggleTheme }: FooterProps) => {
 
         {/* Brand */}
         <div className="footer-brand">
-          <h2>PhotoPortfolio</h2>
+          <h2>Visualnest</h2>
           <p>
             Capturing emotions, moments and stories<br />
             through timeless photography.
@@ -162,7 +162,7 @@ const Footer = ({ theme, onToggleTheme }: FooterProps) => {
 
       {/* Bottom */}
       <div className="footer-bottom">
-        © {new Date().getFullYear()} PhotoPortfolio. All rights reserved.
+        © {new Date().getFullYear()} Visualnest. All rights reserved.
         <button type="button" className="footer-theme-toggle" onClick={onToggleTheme}>
           {theme === "light" ? "Switch to Dark" : "Switch to Light"}
         </button>

@@ -58,6 +58,15 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
+  @PostMapping("/check-email")
+  public ResponseEntity<Map<String, Object>> checkEmail(@Valid @RequestBody ForgotPasswordRequest request) {
+    boolean exists = authService.isEmailRegistered(request.getEmail());
+    Map<String, Object> response = new HashMap<>();
+    response.put("exists", exists);
+    response.put("email", request.getEmail().trim().toLowerCase());
+    return ResponseEntity.ok(response);
+  }
+
   @PostMapping("/send-registration-otp")
   public ResponseEntity<Map<String, String>> sendRegistrationOtp(@Valid @RequestBody RegistrationOtpRequest request) {
     authService.sendRegistrationOtp(request.getName(), request.getEmail());

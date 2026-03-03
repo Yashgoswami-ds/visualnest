@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/admin.css";
-import { sendRegistrationOtp, verifyRegistrationOtp } from "../services/api";
+import { checkAuthEmailExists, sendRegistrationOtp, verifyRegistrationOtp } from "../services/api";
 import { useAdminAuthBackground } from "../hooks/useAdminAuthBackground";
 
 const AdminCreateUser = () => {
@@ -41,6 +41,13 @@ const AdminCreateUser = () => {
 
     try {
       setRequesting(true);
+      const alreadyExists = await checkAuthEmailExists(data.normalizedEmail);
+      if (alreadyExists) {
+        setInfo("Email already present. If you want reset, use Forgot Password (Link/OTP).");
+        navigate(`/admin-forgot-password?email=${encodeURIComponent(data.normalizedEmail)}`);
+        return;
+      }
+
       await sendRegistrationOtp(data.normalizedName, data.normalizedEmail);
       setOtpSent(true);
       setInfo("OTP sent to your email.");

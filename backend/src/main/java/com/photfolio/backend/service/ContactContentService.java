@@ -48,9 +48,9 @@ public class ContactContentService {
     ContactContent defaultContent = new ContactContent(
         CONTACT_CONTENT_ID,
         "Delhi, India",
-        "hello@photoportfolio.com",
+        "hello@visualnest.com",
       "+91 9XXXXXXXXX",
-      "https://instagram.com/photoportfolio"
+      "https://instagram.com/visualnest"
     );
     return contactContentRepository.save(defaultContent);
   }

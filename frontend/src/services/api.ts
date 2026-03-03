@@ -347,6 +347,33 @@ export const sendRegistrationOtp = async (name: string, email: string) => {
   return res.json();
 };
 
+export const checkAuthEmailExists = async (email: string): Promise<boolean> => {
+  const res = await fetch(`${API_URL}/auth/check-email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    let message = "Failed to check email";
+    try {
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const error = await res.json();
+        if (error?.message) {
+          message = error.message;
+        }
+      }
+    } catch {
+      // keep default message
+    }
+    throw new Error(message);
+  }
+
+  const data = await res.json();
+  return Boolean(data?.exists);
+};
+
 export const verifyRegistrationOtp = async (email: string, otp: string) => {
   const res = await fetch(`${API_URL}/auth/verify-registration-otp`, {
     method: "POST",

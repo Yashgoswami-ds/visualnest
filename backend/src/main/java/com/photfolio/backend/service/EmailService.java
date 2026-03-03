@@ -82,7 +82,7 @@ public class EmailService {
         + "<tr><td align=\"center\">"
         + "<table role=\"presentation\" width=\"620\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:620px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;box-shadow:0 10px 26px rgba(0,0,0,0.08);\">"
         + "<tr><td style=\"background:linear-gradient(120deg,#0f172a 0%,#1d4ed8 55%,#4338ca 100%);padding:18px 22px;color:#ffffff;\">"
-        + "<div style=\"font-size:22px;font-weight:800;letter-spacing:0.4px;\">Photfolio</div>"
+        + "<div style=\"font-size:22px;font-weight:800;letter-spacing:0.4px;\">Visualnest</div>"
         + "<div style=\"margin-top:6px;font-size:12px;opacity:0.9;\">"
         + escapeHtml(title)
         + "</div>"
@@ -158,11 +158,11 @@ public class EmailService {
 
       sendHtmlEmail(
           List.of(email),
-          "Photfolio - Password Reset Request",
+          "Visualnest - Password Reset Request",
           "Password Reset",
           "A password reset request was received for your account.",
           body,
-          "Photfolio • Security Notification",
+          "Visualnest • Security Notification",
           null
       );
     } catch (Exception e) {
@@ -186,11 +186,11 @@ public class EmailService {
 
       sendHtmlEmail(
           List.of(email),
-          "Photfolio Password Reset OTP",
+          "Visualnest Password Reset OTP",
           "Password Reset OTP",
           "Password reset verification is required.",
           body,
-          "Photfolio • Security Notification",
+          "Visualnest • Security Notification",
           null
       );
     } catch (Exception e) {
@@ -209,17 +209,17 @@ public class EmailService {
         return;
       }
 
-      String body = "<p style=\"margin:0 0 10px;font-size:14px;color:#334155;\">Welcome to Photfolio! Your account has been created successfully.</p>"
+      String body = "<p style=\"margin:0 0 10px;font-size:14px;color:#334155;\">Welcome to Visualnest! Your account has been created successfully.</p>"
           + "<p style=\"margin:0 0 10px;font-size:14px;color:#334155;\">You can now log in securely and start managing your gallery.</p>"
           + "<p style=\"margin:0;font-size:13px;color:#64748b;\">If you did not create this account, please contact support immediately.</p>";
 
       sendHtmlEmail(
           List.of(email),
-          "Welcome to Photfolio — Your Account Is Ready",
+          "Welcome to Visualnest — Your Account Is Ready",
           "Welcome",
           "Your account is now ready.",
           body,
-          "Team Photfolio",
+          "Team Visualnest",
           null
       );
     } catch (Exception e) {
@@ -240,11 +240,11 @@ public class EmailService {
 
       sendHtmlEmail(
           List.of(email),
-          "Photfolio Verification Code (OTP)",
+          "Visualnest Verification Code (OTP)",
           "Registration Verification",
           "One last step to complete your registration.",
           body,
-          "Photfolio • Verification",
+          "Visualnest • Verification",
           null
       );
     } catch (Exception e) {
@@ -268,11 +268,11 @@ public class EmailService {
 
       sendHtmlEmail(
           List.of(email),
-          "Photfolio Login OTP",
+          "Visualnest Login OTP",
           "Login Verification",
           "Sign-in verification is required for your account.",
           body,
-          "Photfolio • Security Notification",
+          "Visualnest • Security Notification",
           null
       );
     } catch (Exception e) {
@@ -304,11 +304,11 @@ public class EmailService {
 
       sendHtmlEmail(
           recipients,
-          "Photfolio Admin Access Request",
+          "Visualnest Admin Access Request",
           "Admin Approval Required",
           "A pending admin access request needs your action.",
           body,
-          "Photfolio • Admin Workflow",
+          "Visualnest • Admin Workflow",
           requesterEmail
       );
     } catch (Exception ignored) {
@@ -327,11 +327,11 @@ public class EmailService {
 
       sendHtmlEmail(
           List.of(requesterEmail),
-          "Photfolio Access Request Received",
+          "Visualnest Access Request Received",
           "Request Received",
           "We have received your request.",
           body,
-          "Photfolio • Admin Workflow",
+          "Visualnest • Admin Workflow",
           null
       );
     } catch (Exception ignored) {
@@ -350,11 +350,11 @@ public class EmailService {
 
       sendHtmlEmail(
           List.of(email),
-          "Photfolio Access Approved",
+          "Visualnest Access Approved",
           "Access Approved",
           "Great news — your access is now active.",
           body,
-          "Photfolio • Admin Workflow",
+          "Visualnest • Admin Workflow",
           null
       );
     } catch (Exception ignored) {
@@ -373,11 +373,11 @@ public class EmailService {
 
       sendHtmlEmail(
           List.of(email),
-          "Photfolio Access Request Update",
+          "Visualnest Access Request Update",
           "Access Request Update",
           "There is an update on your admin access request.",
           body,
-          "Photfolio • Admin Workflow",
+          "Visualnest • Admin Workflow",
           null
       );
     } catch (Exception ignored) {
@@ -424,7 +424,7 @@ public class EmailService {
           "Contact Query",
           "A new message has arrived via your website contact form.",
           body,
-          "Photfolio • Contact Notification",
+          "Visualnest • Contact Notification",
           safeReplyTo
       );
 
@@ -449,15 +449,15 @@ public class EmailService {
           : "Hi " + safeUserName + ", thanks for contacting us.";
 
       String body = "<p style=\"margin:0 0 10px;font-size:14px;color:#334155;\">Your query has been received successfully. Our team will get back to you shortly.</p>"
-          + "<p style=\"margin:0;font-size:13px;color:#64748b;\">This is an automated acknowledgement from Photfolio.</p>";
+          + "<p style=\"margin:0;font-size:13px;color:#64748b;\">This is an automated acknowledgement from Visualnest.</p>";
 
       sendHtmlEmail(
           List.of(safeUserEmail),
-          "Photfolio • We received your query",
+          "Visualnest • We received your query",
           "Query Acknowledgement",
           intro,
           body,
-          "Photfolio • Customer Support",
+          "Visualnest • Customer Support",
           null
       );
     } catch (Exception ignored) {

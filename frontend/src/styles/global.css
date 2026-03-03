@@ -5,8 +5,8 @@ body {
   color: var(--soft-black);
   font-family: var(--font-body);
   font-weight: 500;
-  letter-spacing: 0.2px;
-  line-height: 1.6;
+  letter-spacing: 0;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   transition: background-color 0.25s ease, color 0.25s ease;
@@ -14,8 +14,9 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: 0.2px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
 }
 
 p, li, span, a, button, input, textarea {

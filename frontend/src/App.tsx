@@ -9,13 +9,13 @@ type ThemeMode = "light" | "dark";
 
 function App() {
   const [theme, setTheme] = useState<ThemeMode>(() => {
-    const storedTheme = localStorage.getItem("photfolio-theme");
+    const storedTheme = localStorage.getItem("visualnest-theme");
     return storedTheme === "dark" ? "dark" : "light";
   });
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("photfolio-theme", theme);
+    localStorage.setItem("visualnest-theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {

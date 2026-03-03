@@ -14,12 +14,12 @@ public class SwaggerConfig {
   public OpenAPI customOpenAPI() {
     return new OpenAPI()
         .info(new Info()
-            .title("Photfolio API")
+            .title("Visualnest API")
             .version("1.0.0")
-            .description("REST API for Photfolio - Photography Portfolio Management System")
+            .description("REST API for Visualnest - Photography Portfolio Management System")
             .contact(new Contact()
-                .name("Photfolio Team")
-                .email("support@photfolio.com"))
+              .name("Visualnest Team")
+              .email("support@visualnest.com"))
             .license(new License()
                 .name("Apache 2.0")
                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")));

@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: photfolio-backend
+    name: visualnest-backend
   mail:
     host: smtp.gmail.com
     port: 587
@@ -50,7 +50,7 @@ app:
     ttlMinutes: 120
   storage:
     provider: ${APP_STORAGE_PROVIDER:local}
-    uploadDir: ${APP_STORAGE_UPLOAD_DIR:${user.home}/photfolio-uploads}
+    uploadDir: ${APP_STORAGE_UPLOAD_DIR:${user.home}/visualnest-uploads}
     supabase:
       url: ${APP_STORAGE_SUPABASE_URL:}
       serviceKey: ${APP_STORAGE_SUPABASE_SERVICE_KEY:}

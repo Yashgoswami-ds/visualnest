@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/admin.css";
-import { sendResetLink, sendResetOtp } from "../services/api";
+import { checkAuthEmailExists, sendResetLink, sendResetOtp } from "../services/api";
 import { useAdminAuthBackground } from "../hooks/useAdminAuthBackground";
 
 const AdminForgotPassword = () => {
   const authBgStyle = useAdminAuthBackground(["admin-login-bg"]);
-  const [email, setEmail] = useState("");
+  const [searchParams] = useSearchParams();
+  const [email, setEmail] = useState(searchParams.get("email") || "");
   const [method, setMethod] = useState<"link" | "otp">("link");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
@@ -25,6 +26,12 @@ const AdminForgotPassword = () => {
 
     try {
       setSending(true);
+      const exists = await checkAuthEmailExists(normalizedEmail);
+      if (!exists) {
+        setError("Email not found. Please create user first.");
+        return;
+      }
+
       if (method === "link") {
         await sendResetLink(normalizedEmail);
         setInfo("Reset link sent! Check your email.");
