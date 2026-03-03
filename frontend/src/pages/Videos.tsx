@@ -95,6 +95,7 @@ const Videos = () => {
                     isVideo
                     showOverlay={false}
                     autoPlayVideo
+                    customVideoControls
                   />
                   <div className="video-meta">
                     <h3 className="video-meta-title">{video.title || "Untitled video"}</h3>

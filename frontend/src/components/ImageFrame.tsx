@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../styles/image-frame.css";
 
 interface Props {
@@ -7,11 +7,22 @@ interface Props {
   isVideo?: boolean;
   showOverlay?: boolean;
   autoPlayVideo?: boolean;
+  customVideoControls?: boolean;
 }
 
-const ImageFrame = ({ src, alt, isVideo = false, showOverlay = true, autoPlayVideo = false }: Props) => {
+const ImageFrame = ({
+  src,
+  alt,
+  isVideo = false,
+  showOverlay = true,
+  autoPlayVideo = false,
+  customVideoControls = false,
+}: Props) => {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(autoPlayVideo);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const canQuickView = showOverlay && !isVideo;
+  const shouldUseCustomVideoControls = isVideo && customVideoControls;
 
   useEffect(() => {
     if (!isQuickViewOpen) {
@@ -33,6 +44,26 @@ const ImageFrame = ({ src, alt, isVideo = false, showOverlay = true, autoPlayVid
     };
   }, [isQuickViewOpen]);
 
+  useEffect(() => {
+    if (!isVideo) {
+      return;
+    }
+
+    setIsVideoPlaying(autoPlayVideo);
+  }, [isVideo, autoPlayVideo, src]);
+
+  const toggleVideoPlayback = () => {
+    if (!videoRef.current) {
+      return;
+    }
+
+    if (videoRef.current.paused) {
+      void videoRef.current.play();
+    } else {
+      videoRef.current.pause();
+    }
+  };
+
   return (
     <>
       <div
@@ -52,14 +83,38 @@ const ImageFrame = ({ src, alt, isVideo = false, showOverlay = true, autoPlayVid
         }
       >
         {isVideo ? (
-          <video
-            src={src}
-            controls
-            playsInline
-            autoPlay={autoPlayVideo}
-            muted={autoPlayVideo}
-            loop={autoPlayVideo}
-          />
+          <>
+            <video
+              ref={videoRef}
+              src={src}
+              controls={!shouldUseCustomVideoControls}
+              playsInline
+              autoPlay={autoPlayVideo}
+              muted={autoPlayVideo}
+              loop={autoPlayVideo}
+              onPlay={() => setIsVideoPlaying(true)}
+              onPause={() => setIsVideoPlaying(false)}
+            />
+            {shouldUseCustomVideoControls && (
+              <button
+                type="button"
+                className="video-play-pause-btn"
+                onClick={toggleVideoPlayback}
+                aria-label={isVideoPlaying ? "Pause video" : "Play video"}
+              >
+                {isVideoPlaying ? (
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M8 6.5V17.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+                    <path d="M16 6.5V17.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M8 6.5L17 12L8 17.5V6.5Z" fill="currentColor" />
+                  </svg>
+                )}
+              </button>
+            )}
+          </>
         ) : (
           <img src={src} alt={alt || "gallery image"} />
         )}
