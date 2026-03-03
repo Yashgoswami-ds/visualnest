@@ -21,6 +21,7 @@ Use this checklist every time before deployment.
 - [ ] `APP_ADMIN_EMAIL` (only if you want seed admin)
 - [ ] `APP_ADMIN_PASSWORD` (only if you want seed admin)
 - [ ] `MAIL_USERNAME`, `MAIL_APP_PASSWORD` (mail features)
+- [ ] SMTP override (if Render mail timeout): `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_STARTTLS_ENABLE`, `SPRING_MAIL_SSL_ENABLE`
 - [ ] `APP_BASE_URL` (if absolute media URL generation needed)
 
 ### Supabase Storage (Recommended for media)
@@ -53,3 +54,4 @@ Use this checklist every time before deployment.
 - Login 400 invalid credentials => using wrong DB/user or seed mismatch
 - Data missing => wrong DB name in URI (must be `photfolioDb`)
 - Images missing => files not present on server disk or media URL path issue
+- Render mail timeout => try Gmail SSL mode (`SPRING_MAIL_PORT=465`, `SPRING_MAIL_STARTTLS_ENABLE=false`, `SPRING_MAIL_SSL_ENABLE=true`) and redeploy

@@ -7,14 +7,14 @@ spring:
   application:
     name: visualnest-backend
   mail:
-    host: smtp.gmail.com
-    port: 587
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:587}
     username: ${SPRING_MAIL_USERNAME:${MAIL_USERNAME:}}
     password: ${MAIL_APP_PASSWORD:${SPRING_MAIL_PASSWORD:${MAIL_PASSWORD:}}}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: ${SPRING_MAIL_SMTP_AUTH:true}
           connectiontimeout: 15000
           timeout: 15000
           writetimeout: 15000
@@ -22,7 +22,9 @@ spring:
           connectionpoolsize: 5
           quitwait: false
           starttls:
-            enable: true
+            enable: ${SPRING_MAIL_STARTTLS_ENABLE:true}
+          ssl:
+            enable: ${SPRING_MAIL_SSL_ENABLE:false}
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
