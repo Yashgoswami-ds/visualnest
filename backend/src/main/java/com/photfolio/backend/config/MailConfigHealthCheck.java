@@ -11,26 +11,26 @@ public class MailConfigHealthCheck {
   @Bean
   public CommandLineRunner mailHealthCheckRunner(
       @Value("${spring.mail.username:}") String mailUsername,
-      @Value("${MAIL_APP_PASSWORD:}") String mailAppPassword,
+      @Value("${spring.mail.password:}") String mailPassword,
       @Value("${app.admin.email:}") String adminEmail
   ) {
     return args -> {
       boolean hasUsername = mailUsername != null && !mailUsername.trim().isEmpty();
-      boolean hasAppPassword = mailAppPassword != null && !mailAppPassword.trim().isEmpty();
+      boolean hasPassword = mailPassword != null && !mailPassword.trim().isEmpty();
       boolean hasAdminEmail = adminEmail != null && !adminEmail.trim().isEmpty();
 
-      if (hasUsername && hasAppPassword && hasAdminEmail) {
-        System.out.println("✅ Mail config check: OK (username, app password, admin recipient configured)");
+      if (hasUsername && hasPassword) {
+        System.out.println("✅ Mail config check: OK (SMTP username/password configured)");
+        if (!hasAdminEmail) {
+          System.out.println("⚠️ Mail note: app.admin.email not set (admin approval mails will go to sender address)");
+        }
       } else {
         System.out.println("⚠️ Mail config check: INCOMPLETE");
         if (!hasUsername) {
           System.out.println("   - Missing spring.mail.username");
         }
-        if (!hasAppPassword) {
-          System.out.println("   - Missing MAIL_APP_PASSWORD environment variable");
-        }
-        if (!hasAdminEmail) {
-          System.out.println("   - Missing app.admin.email");
+        if (!hasPassword) {
+          System.out.println("   - Missing spring.mail.password");
         }
       }
     };

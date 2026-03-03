@@ -23,6 +23,13 @@ Use this checklist every time before deployment.
 - [ ] `MAIL_USERNAME`, `MAIL_APP_PASSWORD` (mail features)
 - [ ] `APP_BASE_URL` (if absolute media URL generation needed)
 
+### Supabase Storage (Recommended for media)
+- [ ] `APP_STORAGE_PROVIDER=supabase`
+- [ ] `APP_STORAGE_SUPABASE_URL=https://<project-ref>.supabase.co`
+- [ ] `APP_STORAGE_SUPABASE_SERVICE_KEY=<service_role_key>`
+- [ ] `APP_STORAGE_SUPABASE_BUCKET=<public_bucket_name>`
+- [ ] `APP_STORAGE_SUPABASE_FOLDER=gallery` (optional)
+
 ### Backend Smoke Test
 - [ ] `GET /api/gallery` => 200 and non-zero count
 - [ ] `GET /api/content/about` => 200
@@ -39,7 +46,7 @@ Use this checklist every time before deployment.
 
 ## 4) Media/File Note (Important)
 - Free hosts can have ephemeral disk.
-- If uploads disappear after restart/redeploy, move media to Cloudinary/S3-compatible storage.
+- If uploads disappear after restart/redeploy, use Supabase Storage and keep only media URL in MongoDB.
 
 ## 5) Fast Troubleshooting
 - JWT key size error => `JWT_SECRET` too short (<64 chars)

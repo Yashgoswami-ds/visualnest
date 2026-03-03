@@ -18,11 +18,26 @@ public class EmailService {
   @Autowired(required = false)
   private JavaMailSender mailSender;
 
-  @Value("${spring.mail.username:goswamiyash289@gmail.com}")
+  @Value("${spring.mail.username:}")
   private String fromEmail;
 
-  @Value("${app.admin.email:goswamiyash289@gmail.com}")
+  @Value("${app.admin.email:}")
   private String adminEmail;
+
+  private List<String> resolveAdminRecipients() {
+    LinkedHashSet<String> recipients = new LinkedHashSet<>();
+    String safeAdminEmail = safe(adminEmail);
+    String safeFromEmail = safe(fromEmail);
+
+    if (!safeAdminEmail.isEmpty()) {
+      recipients.add(safeAdminEmail);
+    }
+    if (!safeFromEmail.isEmpty()) {
+      recipients.add(safeFromEmail);
+    }
+
+    return new ArrayList<>(recipients);
+  }
 
   private String safe(String value) {
     return Objects.requireNonNullElse(value, "").trim();
@@ -275,6 +290,11 @@ public class EmailService {
         return;
       }
 
+      List<String> recipients = resolveAdminRecipients();
+      if (recipients.isEmpty()) {
+        return;
+      }
+
       String safeRequesterEmail = escapeHtml(requesterEmail);
       String body = "<p style=\"margin:0 0 10px;font-size:14px;color:#334155;\">A new admin access request has been submitted.</p>"
           + "<div style=\"margin:10px 0 0;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;background:#f8fafc;font-size:14px;color:#0f172a;\">"
@@ -283,7 +303,7 @@ public class EmailService {
           + "<p style=\"margin:14px 0 0;font-size:13px;color:#64748b;\">Please login to Admin Panel and approve or reject this request.</p>";
 
       sendHtmlEmail(
-          List.of(adminEmail),
+          recipients,
           "Photfolio Admin Access Request",
           "Admin Approval Required",
           "A pending admin access request needs your action.",
@@ -371,19 +391,9 @@ public class EmailService {
         throw new RuntimeException("Email service is not configured on server");
       }
 
-      String safeAdminEmail = safe(adminEmail);
-      String safeFromEmail = safe(fromEmail);
       String safeReplyTo = safe(email);
 
-      LinkedHashSet<String> recipientSet = new LinkedHashSet<>();
-      if (!safeAdminEmail.isEmpty()) {
-        recipientSet.add(safeAdminEmail);
-      }
-      if (!safeFromEmail.isEmpty()) {
-        recipientSet.add(safeFromEmail);
-      }
-
-      List<String> recipients = new ArrayList<>(recipientSet);
+      List<String> recipients = resolveAdminRecipients();
       if (recipients.isEmpty()) {
         throw new RuntimeException("No recipient configured for contact query email");
       }

@@ -7,6 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,14 +26,32 @@ import java.util.*;
 @Service
 public class GalleryService {
 
+  private static final String STORAGE_PROVIDER_LOCAL = "local";
+  private static final String STORAGE_PROVIDER_SUPABASE = "supabase";
+
   @Autowired
   private ImageRepository imageRepository;
+
+  @Value("${app.storage.provider:local}")
+  private String storageProvider;
 
   @Value("${app.storage.uploadDir}")
   private String uploadDir;
 
   @Value("${app.baseUrl:}")
   private String appBaseUrl;
+
+  @Value("${app.storage.supabase.url:}")
+  private String supabaseUrl;
+
+  @Value("${app.storage.supabase.serviceKey:}")
+  private String supabaseServiceKey;
+
+  @Value("${app.storage.supabase.bucket:}")
+  private String supabaseBucket;
+
+  @Value("${app.storage.supabase.folder:gallery}")
+  private String supabaseFolder;
 
   public GalleryService() {
     // Constructor for Spring
@@ -90,9 +117,10 @@ public class GalleryService {
 
   public void deleteImage(String id) {
     String safeId = Objects.requireNonNull(id, "id is required");
-    if (!imageRepository.existsById(safeId)) {
-      throw new RuntimeException("Image not found");
-    }
+    ImageDto image = imageRepository.findById(safeId)
+        .orElseThrow(() -> new RuntimeException("Image not found"));
+
+    deleteStoredMediaIfPossible(image.getUrl());
     imageRepository.deleteById(safeId);
   }
 
@@ -111,12 +139,6 @@ public class GalleryService {
       String sanitizedName = originalName.replaceAll("[^a-zA-Z0-9._-]", "_");
       String storedName = UUID.randomUUID() + "-" + sanitizedName;
 
-      Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-      Files.createDirectories(uploadPath);
-
-      Path targetPath = uploadPath.resolve(storedName);
-      Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-
       ImageDto imageDto = new ImageDto();
       imageDto.setId(UUID.randomUUID().toString());
       imageDto.setTitle((title == null || title.isBlank()) ? sanitizedName : title);
@@ -126,11 +148,202 @@ public class GalleryService {
       imageDto.setSection(resolveSection(imageDto.getCategory()));
       imageDto.setCreatedAt(Instant.now());
       imageDto.setUpdatedAt(Instant.now());
-      imageDto.setUrl(buildPublicUploadUrl(storedName));
+      imageDto.setUrl(storeMediaAndGetUrl(file, storedName, contentType));
 
       return imageRepository.save(imageDto);
     } catch (Exception e) {
       throw new RuntimeException("Media upload failed", e);
+    }
+  }
+
+  private String storeMediaAndGetUrl(MultipartFile file, String storedName, String contentType) throws IOException {
+    if (isSupabaseProviderEnabled()) {
+      return uploadToSupabase(file, storedName, contentType);
+    }
+
+    Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+    Files.createDirectories(uploadPath);
+    Path targetPath = uploadPath.resolve(storedName);
+    Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+    return buildPublicUploadUrl(storedName);
+  }
+
+  private boolean isSupabaseProviderEnabled() {
+    return STORAGE_PROVIDER_SUPABASE.equalsIgnoreCase(Objects.requireNonNullElse(storageProvider, STORAGE_PROVIDER_LOCAL).trim());
+  }
+
+  private String uploadToSupabase(MultipartFile file, String storedName, String contentType) throws IOException {
+    validateSupabaseConfig();
+
+    String objectPath = buildSupabaseObjectPath(storedName);
+    String encodedBucket = encodePathSegment(supabaseBucket.trim());
+    String encodedObjectPath = encodePath(objectPath);
+    String endpoint = normalizeSupabaseBaseUrl() + "/storage/v1/object/" + encodedBucket + "/" + encodedObjectPath;
+
+    HttpURLConnection connection = (HttpURLConnection) new URL(endpoint).openConnection();
+    connection.setRequestMethod("POST");
+    connection.setDoOutput(true);
+    connection.setRequestProperty("Authorization", "Bearer " + supabaseServiceKey.trim());
+    connection.setRequestProperty("apikey", supabaseServiceKey.trim());
+    connection.setRequestProperty("x-upsert", "true");
+    connection.setRequestProperty("Content-Type", contentType);
+
+    try (OutputStream outputStream = connection.getOutputStream()) {
+      outputStream.write(file.getBytes());
+    }
+
+    int status = connection.getResponseCode();
+    if (status < 200 || status >= 300) {
+      throw new RuntimeException("Supabase upload failed with status " + status + ": " + readErrorBody(connection));
+    }
+
+    return normalizeSupabaseBaseUrl() + "/storage/v1/object/public/" + encodedBucket + "/" + encodedObjectPath;
+  }
+
+  private void deleteStoredMediaIfPossible(String url) {
+    String mediaUrl = url == null ? "" : url.trim();
+    if (mediaUrl.isBlank()) {
+      return;
+    }
+
+    if (mediaUrl.startsWith("/uploads/")) {
+      deleteLocalUploadedMedia(mediaUrl);
+      return;
+    }
+
+    if (isSupabaseProviderEnabled()) {
+      String objectPath = extractSupabaseObjectPath(mediaUrl);
+      if (!objectPath.isBlank()) {
+        deleteFromSupabase(objectPath);
+      }
+    }
+  }
+
+  private void deleteLocalUploadedMedia(String mediaUrl) {
+    String fileName = mediaUrl.substring("/uploads/".length());
+    int queryIndex = fileName.indexOf('?');
+    if (queryIndex >= 0) {
+      fileName = fileName.substring(0, queryIndex);
+    }
+
+    int hashIndex = fileName.indexOf('#');
+    if (hashIndex >= 0) {
+      fileName = fileName.substring(0, hashIndex);
+    }
+
+    if (fileName.isBlank()) {
+      return;
+    }
+
+    try {
+      Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+      Path mediaPath = uploadPath.resolve(fileName).normalize();
+      if (mediaPath.startsWith(uploadPath)) {
+        Files.deleteIfExists(mediaPath);
+      }
+    } catch (Exception ignored) {
+    }
+  }
+
+  private void deleteFromSupabase(String objectPath) {
+    try {
+      validateSupabaseConfig();
+      String encodedBucket = encodePathSegment(supabaseBucket.trim());
+      String encodedObjectPath = encodePath(objectPath);
+      String endpoint = normalizeSupabaseBaseUrl() + "/storage/v1/object/" + encodedBucket + "/" + encodedObjectPath;
+
+      HttpURLConnection connection = (HttpURLConnection) new URL(endpoint).openConnection();
+      connection.setRequestMethod("DELETE");
+      connection.setRequestProperty("Authorization", "Bearer " + supabaseServiceKey.trim());
+      connection.setRequestProperty("apikey", supabaseServiceKey.trim());
+
+      int status = connection.getResponseCode();
+      if (status == 404 || (status >= 200 && status < 300)) {
+        return;
+      }
+      throw new RuntimeException("Supabase delete failed with status " + status + ": " + readErrorBody(connection));
+    } catch (Exception ignored) {
+    }
+  }
+
+  private String extractSupabaseObjectPath(String mediaUrl) {
+    try {
+      validateSupabaseConfig();
+      URI uri = URI.create(mediaUrl);
+      String path = Objects.requireNonNullElse(uri.getPath(), "");
+      String bucket = supabaseBucket.trim();
+      String prefix = "/storage/v1/object/public/" + bucket + "/";
+      if (!path.startsWith(prefix)) {
+        return "";
+      }
+      String encodedPath = path.substring(prefix.length());
+      if (encodedPath.isBlank()) {
+        return "";
+      }
+      return URLDecoder.decode(encodedPath, StandardCharsets.UTF_8);
+    } catch (Exception ignored) {
+      return "";
+    }
+  }
+
+  private void validateSupabaseConfig() {
+    if (supabaseUrl == null || supabaseUrl.isBlank()) {
+      throw new RuntimeException("Missing app.storage.supabase.url configuration");
+    }
+    if (supabaseServiceKey == null || supabaseServiceKey.isBlank()) {
+      throw new RuntimeException("Missing app.storage.supabase.serviceKey configuration");
+    }
+    if (supabaseBucket == null || supabaseBucket.isBlank()) {
+      throw new RuntimeException("Missing app.storage.supabase.bucket configuration");
+    }
+  }
+
+  private String buildSupabaseObjectPath(String storedName) {
+    String folder = Objects.requireNonNullElse(supabaseFolder, "").trim();
+    if (folder.startsWith("/")) {
+      folder = folder.substring(1);
+    }
+    while (folder.endsWith("/")) {
+      folder = folder.substring(0, folder.length() - 1);
+    }
+    if (folder.isBlank()) {
+      return storedName;
+    }
+    return folder + "/" + storedName;
+  }
+
+  private String encodePath(String path) {
+    String[] segments = path.split("/");
+    StringBuilder encoded = new StringBuilder();
+    for (int i = 0; i < segments.length; i++) {
+      if (i > 0) {
+        encoded.append('/');
+      }
+      encoded.append(encodePathSegment(segments[i]));
+    }
+    return encoded.toString();
+  }
+
+  private String encodePathSegment(String value) {
+    return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
+  }
+
+  private String normalizeSupabaseBaseUrl() {
+    String base = supabaseUrl == null ? "" : supabaseUrl.trim();
+    while (base.endsWith("/")) {
+      base = base.substring(0, base.length() - 1);
+    }
+    return base;
+  }
+
+  private String readErrorBody(HttpURLConnection connection) {
+    try (InputStream errorStream = connection.getErrorStream()) {
+      if (errorStream == null) {
+        return "";
+      }
+      return new String(errorStream.readAllBytes(), StandardCharsets.UTF_8);
+    } catch (Exception ignored) {
+      return "";
     }
   }
 

@@ -8,6 +8,14 @@ const AdminGallery = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
 
+  const isVideoMedia = (item: Image): boolean => {
+    if (item.mediaKind) {
+      return item.mediaKind === "video";
+    }
+    const type = item.mediaType?.toLowerCase() ?? "";
+    return type.startsWith("video/");
+  };
+
   // Fetch existing images from backend
   const loadImages = async () => {
     try {
@@ -91,7 +99,11 @@ const AdminGallery = () => {
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
         {images.map((img) => (
           <div key={img.id} style={{ position: "relative" }}>
-            <img src={img.url} alt={img.title} width={150} />
+            {isVideoMedia(img) ? (
+              <video src={img.url} width={150} controls muted playsInline />
+            ) : (
+              <img src={img.url} alt={img.title} width={150} />
+            )}
             <button
               style={{ position: "absolute", top: 0, right: 0 }}
               onClick={() => handleDelete(img.id)}
