@@ -97,8 +97,8 @@ const Videos = () => {
                     autoPlayVideo
                   />
                   <div className="video-meta">
-                    <h3>{video.title || "Untitled video"}</h3>
-                    <p>{video.category || "general"}</p>
+                    <h3 className="video-meta-title">{video.title || "Untitled video"}</h3>
+                    <p className="video-meta-category">{video.category || "general"}</p>
                   </div>
                 </Grid.Col>
               ))}
