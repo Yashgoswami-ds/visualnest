@@ -9,8 +9,6 @@ This project was developed as a client project for a photography business. The g
 ## Live Demo and Video
 
 - Repository: https://github.com/Yashgoswami-ds/visualnest
-- Frontend demo: To be added after deployment
-- Backend API: To be added after deployment
 - Demo video and project assets: [Google Drive folder](https://drive.google.com/drive/folders/15S8zculoeq7UxnfwgDC5QiIhHsY4xB--)
 
 ### Demo and Loading Note
