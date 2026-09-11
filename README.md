@@ -79,6 +79,54 @@ The backend is deployed on Render, which may go into sleep mode when it is not u
 
 ## Application Flow
 
+### Overall System Architecture
+
+```mermaid
+flowchart LR
+	Visitor[Public Visitor]
+	Admin[Admin User]
+	Frontend[React + TypeScript Frontend\nVercel]
+	Backend[Spring Boot REST API\nRender]
+	Security[Spring Security + JWT]
+	Mongo[(MongoDB Atlas\nContent + Metadata)]
+	Supabase[(Supabase Storage\nImages + Videos)]
+	Redis[(Redis\nOTP Sessions)]
+	Mail[SMTP Email Provider\nOTP + Notifications]
+
+	Visitor --> Frontend
+	Admin --> Frontend
+	Frontend -->|REST /api requests| Backend
+	Backend --> Security
+	Security -->|Public requests| Mongo
+	Security -->|Protected admin requests| Mongo
+	Backend -->|Read/write media metadata| Mongo
+	Backend -->|Upload/delete media files| Supabase
+	Backend -->|Store OTP with TTL| Redis
+	Backend -->|Send OTP and notifications| Mail
+	Frontend -->|Load public media URL| Supabase
+```
+
+### Deployment Flow
+
+```mermaid
+flowchart LR
+	Code[GitHub Repository]
+	Vercel[Vercel Frontend]
+	Render[Render Backend]
+	Atlas[MongoDB Atlas]
+	Storage[Supabase Storage]
+	Cache[Managed Redis]
+	Email[SMTP Provider]
+
+	Code -->|Build and deploy| Vercel
+	Code -->|Build Docker/Spring Boot service| Render
+	Vercel -->|HTTPS API calls| Render
+	Render --> Atlas
+	Render --> Storage
+	Render --> Cache
+	Render --> Email
+```
+
 ### Public Visitor Flow
 
 1. Visitor opens the home page.
@@ -97,6 +145,34 @@ The backend is deployed on Render, which may go into sleep mode when it is not u
 6. Super admin reviews the request in the dashboard.
 7. After approval, the user can log in and receive a JWT token.
 
+```mermaid
+sequenceDiagram
+	participant U as User
+	participant F as React Frontend
+	participant B as Spring Boot API
+	participant R as Redis
+	participant M as MongoDB
+	participant E as Email Provider
+	participant A as Super Admin
+
+	U->>F: Submit name and email
+	F->>B: POST /api/auth/send-registration-otp
+	B->>R: Save OTP with five-minute TTL
+	B->>M: Save OTP audit record
+	B->>E: Send OTP email
+	E-->>U: Six-digit OTP
+	U->>F: Enter OTP and password
+	F->>B: Verify OTP and set password
+	B->>R: Read and delete OTP session
+	B->>M: Create user with pending approval
+	U->>F: Request admin access
+	F->>B: Submit access request
+	B->>M: Update approval status to pending
+	B-->>A: Notify super admin
+	A->>B: Approve access request
+	B->>M: Update user to approved
+```
+
 ### Login Flow
 
 1. User submits email and password.
@@ -112,6 +188,77 @@ The backend is deployed on Render, which may go into sleep mode when it is not u
 4. File is uploaded to Supabase Storage when the Supabase provider is enabled.
 5. Media URL, title, category, type, and timestamps are saved in MongoDB.
 6. Public gallery APIs return the saved metadata to the frontend.
+
+```mermaid
+sequenceDiagram
+	participant A as Admin Dashboard
+	participant B as Spring Boot API
+	participant J as JWT Security
+	participant S as Supabase Storage
+	participant M as MongoDB
+	participant V as Public Visitor
+
+	A->>B: POST /api/gallery/upload with Bearer token
+	B->>J: Validate JWT and admin permission
+	J-->>B: Request authorized
+	B->>S: Upload image/video file
+	S-->>B: Return public media URL
+	B->>M: Save URL, category, type, and timestamps
+	B-->>A: Return saved media metadata
+	V->>B: GET /api/gallery
+	B->>M: Read public media metadata
+	M-->>B: Return media records
+	B-->>V: Return media URLs
+	V->>S: Load image/video from public URL
+```
+
+### Data and Storage Relationship
+
+```mermaid
+erDiagram
+	USER {
+		string id PK
+		string email
+		string passwordHash
+		string role
+		string approvalStatus
+		datetime createdAt
+	}
+	IMAGE_MEDIA {
+		string id PK
+		string url
+		string title
+		string category
+		string mediaKind
+		string section
+		datetime createdAt
+		datetime updatedAt
+	}
+	OTP_AUDIT {
+		string id PK
+		string email
+		string purpose
+		string status
+		datetime expiresAt
+		int attempts
+	}
+	ADMIN_ACCESS_SETTINGS {
+		string id PK
+		int maxApprovedAdmins
+	}
+	SUPABASE_OBJECT {
+		string publicUrl PK
+		string bucket
+		string folder
+		string mediaType
+	}
+
+	USER ||--o{ OTP_AUDIT : requests
+	IMAGE_MEDIA }o--|| SUPABASE_OBJECT : references
+	ADMIN_ACCESS_SETTINGS ||--o{ USER : controls
+```
+
+MongoDB stores application records and media metadata. Supabase stores the binary image/video objects. Redis stores temporary OTP sessions with automatic expiry, while MongoDB keeps the audit history.
 
 ## API Overview
 
