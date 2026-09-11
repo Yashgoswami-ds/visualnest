@@ -11,7 +11,11 @@ This project was developed as a client project for a photography business. The g
 - Repository: https://github.com/Yashgoswami-ds/visualnest
 - Frontend demo: To be added after deployment
 - Backend API: To be added after deployment
-- Demo video: To be added after recording
+- Demo video and project assets: [Google Drive folder](https://drive.google.com/drive/folders/15S8zculoeq7UxnfwgDC5QiIhHsY4xB--)
+
+### Demo and Loading Note
+
+The backend is deployed on Render, which may go into sleep mode when it is not used. Because of this, the first request can take a little longer while the service performs a cold start. Images and videos are stored in Supabase Storage, so media may also take a few seconds to load on the first visit. Please wait briefly and refresh once if the backend is waking up.
 
 ## Main Features
 
@@ -228,6 +232,20 @@ MAIL_USERNAME=your-email@example.com
 MAIL_APP_PASSWORD=your-smtp-or-gmail-app-password
 APP_ADMIN_EMAIL=admin@example.com
 ```
+
+### Redis OTP Session Variables
+
+Use a managed Redis instance in production so pending OTP sessions survive backend restarts:
+
+```env
+APP_OTP_STORE=redis
+REDIS_HOST=your-redis-host
+REDIS_PORT=6379
+REDIS_PASSWORD=your-redis-password
+REDIS_SSL=true
+```
+
+For local development, keep `APP_OTP_STORE=memory` or run Redis locally. OTP sessions stored in memory are cleared when the backend restarts.
 
 ### Supabase Storage Variables
 

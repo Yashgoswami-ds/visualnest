@@ -29,6 +29,12 @@ spring:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
       auto-index-creation: true
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      ssl:
+        enabled: ${REDIS_SSL:false}
   servlet:
     multipart:
       max-file-size: 25MB
@@ -42,6 +48,8 @@ springdoc:
     enabled: true
 
 app:
+  otp:
+    store: ${APP_OTP_STORE:memory}
   baseUrl: ${APP_BASE_URL:}
   frontendBaseUrl: ${APP_FRONTEND_BASE_URL:http://localhost:5173}
   admin:

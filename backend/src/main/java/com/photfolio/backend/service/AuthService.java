@@ -15,11 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,11 +49,10 @@ public class AuthService {
   @Autowired
   private AdminAccessSettingsRepository adminAccessSettingsRepository;
 
+  @Autowired
+  private OtpSessionStore otpSessionStore;
+
   private final SecureRandom secureRandom = new SecureRandom();
-  private final Map<String, PendingRegistration> pendingRegistrations = new ConcurrentHashMap<>();
-  private final Map<String, PendingPasswordSetup> pendingPasswordSetups = new ConcurrentHashMap<>();
-  private final Map<String, PendingLogin> pendingLogins = new ConcurrentHashMap<>();
-  private final Map<String, PendingPasswordReset> pendingPasswordResets = new ConcurrentHashMap<>();
 
   private static final long OTP_TTL_SECONDS = 5 * 60;
   private static final long PASSWORD_RESET_LINK_TTL_MILLIS = 5 * 60 * 1000;
@@ -113,6 +112,70 @@ public class AuthService {
 
   private String normalizeEmail(String email) {
     return email == null ? "" : email.trim().toLowerCase();
+  }
+
+  private String otpKey(String type, String email) {
+    return "visualnest:otp:" + type + ":" + email;
+  }
+
+  private void saveRegistration(String email, PendingRegistration pending) {
+    otpSessionStore.put(otpKey("registration", email), Map.of(
+        "name", pending.name,
+        "otp", pending.otp,
+        "expiresAt", pending.expiresAt.toString(),
+        "auditId", pending.auditId
+    ), Duration.ofSeconds(OTP_TTL_SECONDS));
+  }
+
+  private PendingRegistration getRegistration(String email) {
+    Map<String, String> values = otpSessionStore.get(otpKey("registration", email));
+    return values.isEmpty() ? null : new PendingRegistration(
+        values.get("name"), values.get("otp"), Instant.parse(values.get("expiresAt")), values.get("auditId")
+    );
+  }
+
+  private void savePasswordSetup(String email, PendingPasswordSetup pending) {
+    otpSessionStore.put(otpKey("password-setup", email), Map.of(
+        "name", pending.name,
+        "expiresAt", pending.expiresAt.toString()
+    ), Duration.ofSeconds(REGISTRATION_PASSWORD_SETUP_TTL_SECONDS));
+  }
+
+  private PendingPasswordSetup getPasswordSetup(String email) {
+    Map<String, String> values = otpSessionStore.get(otpKey("password-setup", email));
+    return values.isEmpty() ? null : new PendingPasswordSetup(
+        values.get("name"), Instant.parse(values.get("expiresAt"))
+    );
+  }
+
+  private void saveLogin(String email, PendingLogin pending) {
+    otpSessionStore.put(otpKey("login", email), Map.of(
+        "otp", pending.otp,
+        "expiresAt", pending.expiresAt.toString(),
+        "auditId", pending.auditId
+    ), Duration.ofSeconds(OTP_TTL_SECONDS));
+  }
+
+  private PendingLogin getLogin(String email) {
+    Map<String, String> values = otpSessionStore.get(otpKey("login", email));
+    return values.isEmpty() ? null : new PendingLogin(
+        values.get("otp"), Instant.parse(values.get("expiresAt")), values.get("auditId")
+    );
+  }
+
+  private void savePasswordReset(String email, PendingPasswordReset pending) {
+    otpSessionStore.put(otpKey("password-reset", email), Map.of(
+        "otp", pending.otp,
+        "expiresAt", pending.expiresAt.toString(),
+        "auditId", pending.auditId
+    ), Duration.ofSeconds(OTP_TTL_SECONDS));
+  }
+
+  private PendingPasswordReset getPasswordReset(String email) {
+    Map<String, String> values = otpSessionStore.get(otpKey("password-reset", email));
+    return values.isEmpty() ? null : new PendingPasswordReset(
+        values.get("otp"), Instant.parse(values.get("expiresAt")), values.get("auditId")
+    );
   }
 
   private AdminAccessSettings getOrCreateAccessSettings() {
@@ -213,14 +276,14 @@ public class AuthService {
 
   public LoginResponse verifyLoginOtp(String email, String otp) {
     String normalizedEmail = normalizeEmail(email);
-    PendingLogin pendingLogin = pendingLogins.get(normalizedEmail);
+    PendingLogin pendingLogin = getLogin(normalizedEmail);
 
     if (pendingLogin == null) {
       throw new RuntimeException("OTP session not found. Please login again.");
     }
 
     if (Instant.now().isAfter(pendingLogin.expiresAt)) {
-      pendingLogins.remove(normalizedEmail);
+      otpSessionStore.delete(otpKey("login", normalizedEmail));
       otpAuditService.markExpired(pendingLogin.auditId);
       throw new RuntimeException("OTP expired. Please login again.");
     }
@@ -230,7 +293,7 @@ public class AuthService {
       throw new RuntimeException("Invalid OTP");
     }
 
-    pendingLogins.remove(normalizedEmail);
+    otpSessionStore.delete(otpKey("login", normalizedEmail));
     otpAuditService.markVerified(pendingLogin.auditId);
 
     User user = getUserOrThrow(normalizedEmail);
@@ -275,24 +338,21 @@ public class AuthService {
     Instant expiresAt = Instant.now().plusSeconds(OTP_TTL_SECONDS);
     String auditId = otpAuditService.createOtpRecord(email, "registration", expiresAt);
 
-    pendingRegistrations.put(
-        email,
-      new PendingRegistration(name, otp, expiresAt, auditId)
-    );
+    saveRegistration(email, new PendingRegistration(name, otp, expiresAt, auditId));
 
     emailService.sendRegistrationOtpEmail(email, otp);
   }
 
   public void verifyRegistrationOtp(String email, String otp) {
     String normalizedEmail = normalizeEmail(email);
-    PendingRegistration pendingRegistration = pendingRegistrations.get(normalizedEmail);
+    PendingRegistration pendingRegistration = getRegistration(normalizedEmail);
 
     if (pendingRegistration == null) {
       throw new RuntimeException("OTP session not found. Please request a new OTP.");
     }
 
     if (Instant.now().isAfter(pendingRegistration.expiresAt)) {
-      pendingRegistrations.remove(normalizedEmail);
+      otpSessionStore.delete(otpKey("registration", normalizedEmail));
       otpAuditService.markExpired(pendingRegistration.auditId);
       throw new RuntimeException("OTP expired. Please request a new OTP.");
     }
@@ -308,15 +368,12 @@ public class AuthService {
       throw new RuntimeException("Account already exists in database. Use existing user access request.");
     }
 
-    pendingPasswordSetups.put(
-        normalizedEmail,
-        new PendingPasswordSetup(
-            pendingRegistration.name,
-            Instant.now().plusSeconds(REGISTRATION_PASSWORD_SETUP_TTL_SECONDS)
-        )
-    );
+    savePasswordSetup(normalizedEmail, new PendingPasswordSetup(
+      pendingRegistration.name,
+      Instant.now().plusSeconds(REGISTRATION_PASSWORD_SETUP_TTL_SECONDS)
+    ));
 
-    pendingRegistrations.remove(normalizedEmail);
+    otpSessionStore.delete(otpKey("registration", normalizedEmail));
     otpAuditService.markVerified(pendingRegistration.auditId);
   }
 
@@ -332,13 +389,13 @@ public class AuthService {
       throw new RuntimeException("Password must be at least 6 characters");
     }
 
-    PendingPasswordSetup pendingPasswordSetup = pendingPasswordSetups.get(normalizedEmail);
+    PendingPasswordSetup pendingPasswordSetup = getPasswordSetup(normalizedEmail);
     if (pendingPasswordSetup == null) {
       throw new RuntimeException("Password setup session not found. Verify OTP again.");
     }
 
     if (Instant.now().isAfter(pendingPasswordSetup.expiresAt)) {
-      pendingPasswordSetups.remove(normalizedEmail);
+      otpSessionStore.delete(otpKey("password-setup", normalizedEmail));
       throw new RuntimeException("Password setup session expired. Verify OTP again.");
     }
 
@@ -357,7 +414,7 @@ public class AuthService {
     newUser.setEnabled(true);
     userRepository.save(newUser);
 
-    pendingPasswordSetups.remove(normalizedEmail);
+    otpSessionStore.delete(otpKey("password-setup", normalizedEmail));
   }
 
   public void requestAdminAccess(LoginRequest request) {
@@ -582,20 +639,20 @@ public class AuthService {
     Instant expiresAt = Instant.now().plusSeconds(OTP_TTL_SECONDS);
     String auditId = otpAuditService.createOtpRecord(normalizedEmail, "password-reset", expiresAt);
 
-    pendingPasswordResets.put(normalizedEmail, new PendingPasswordReset(otp, expiresAt, auditId));
+    savePasswordReset(normalizedEmail, new PendingPasswordReset(otp, expiresAt, auditId));
     emailService.sendPasswordResetOtpEmail(normalizedEmail, otp);
   }
 
   public void resetPasswordWithOtp(String email, String otp, String newPassword) {
     String normalizedEmail = normalizeEmail(email);
-    PendingPasswordReset pendingPasswordReset = pendingPasswordResets.get(normalizedEmail);
+    PendingPasswordReset pendingPasswordReset = getPasswordReset(normalizedEmail);
 
     if (pendingPasswordReset == null) {
       throw new RuntimeException("OTP session not found. Please request a new OTP.");
     }
 
     if (Instant.now().isAfter(pendingPasswordReset.expiresAt)) {
-      pendingPasswordResets.remove(normalizedEmail);
+      otpSessionStore.delete(otpKey("password-reset", normalizedEmail));
       otpAuditService.markExpired(pendingPasswordReset.auditId);
       throw new RuntimeException("OTP expired. Please request a new OTP.");
     }
@@ -610,7 +667,7 @@ public class AuthService {
     user.setPassword(encodedPassword);
     user.setSessionVersion(user.getSessionVersion() + 1);
     userRepository.save(user);
-    pendingPasswordResets.remove(normalizedEmail);
+    otpSessionStore.delete(otpKey("password-reset", normalizedEmail));
     otpAuditService.markVerified(pendingPasswordReset.auditId);
   }
 
