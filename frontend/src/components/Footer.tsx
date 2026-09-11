@@ -60,12 +60,15 @@ const Footer = ({ theme, onToggleTheme }: FooterProps) => {
       }
     };
 
-    void loadContactContent();
-    void loadProfileName();
+    const loadTimer = window.setTimeout(() => {
+      void loadContactContent();
+      void loadProfileName();
+    }, 0);
     window.addEventListener("contact-content-updated", handleContactContentUpdated);
     window.addEventListener("storage", handleStorage);
 
     return () => {
+      window.clearTimeout(loadTimer);
       window.removeEventListener("contact-content-updated", handleContactContentUpdated);
       window.removeEventListener("storage", handleStorage);
     };

@@ -49,7 +49,11 @@ const ImageFrame = ({
       return;
     }
 
-    setIsVideoPlaying(autoPlayVideo);
+    const syncTimer = window.setTimeout(() => {
+      setIsVideoPlaying(autoPlayVideo);
+    }, 0);
+
+    return () => window.clearTimeout(syncTimer);
   }, [isVideo, autoPlayVideo, src]);
 
   const toggleVideoPlayback = () => {

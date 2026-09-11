@@ -81,7 +81,7 @@ public class EmailService {
         + "<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"padding:24px 12px;\">"
         + "<tr><td align=\"center\">"
         + "<table role=\"presentation\" width=\"620\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:620px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;box-shadow:0 10px 26px rgba(0,0,0,0.08);\">"
-        + "<tr><td style=\"background:linear-gradient(120deg,#0f172a 0%,#1d4ed8 55%,#4338ca 100%);padding:18px 22px;color:#ffffff;\">"
+          + "<tr><td style=\"background:linear-gradient(120deg,#0f172a 0%,#1d4ed8 55%,#4338ca 100%);padding:18px 22px;color:#ffffff;\">"
         + "<div style=\"font-size:22px;font-weight:800;letter-spacing:0.4px;\">Visualnest</div>"
         + "<div style=\"margin-top:6px;font-size:12px;opacity:0.9;\">"
         + escapeHtml(title)

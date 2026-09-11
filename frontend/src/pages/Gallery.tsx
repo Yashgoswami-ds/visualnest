@@ -13,8 +13,7 @@ type GalleryMedia = {
   isVideo?: boolean;
 };
 
-const Gallery = () => {
-  const privateGalleryCategories = new Set([
+const privateGalleryCategories = new Set([
     "about-profile",
     "home-first",
     "about-video",
@@ -22,9 +21,9 @@ const Gallery = () => {
     "admin",
     "admin-photo",
     "admin-video",
-  ]);
+]);
 
-  const isPrivateGalleryCategory = (value: string) => {
+const isPrivateGalleryCategory = (value: string) => {
     const normalized = (value || "").trim().toLowerCase();
     if (!normalized) {
       return false;
@@ -39,9 +38,9 @@ const Gallery = () => {
     }
 
     return false;
-  };
+};
 
-  const isPrivateGalleryMedia = (item: Image) => {
+const isPrivateGalleryMedia = (item: Image) => {
     if (isPrivateGalleryCategory(item.category || "")) {
       return true;
     }
@@ -57,7 +56,9 @@ const Gallery = () => {
     }
 
     return false;
-  };
+};
+
+const Gallery = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "all";

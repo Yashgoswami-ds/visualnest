@@ -48,7 +48,7 @@ const ResetPassword = () => {
       setInfo("Password reset successful! Redirecting to login...");
       setError("");
       setTimeout(() => navigate("/admin-login"), 2000);
-    } catch (err) {
+    } catch {
       setError("Failed to reset password");
       setInfo("");
     }

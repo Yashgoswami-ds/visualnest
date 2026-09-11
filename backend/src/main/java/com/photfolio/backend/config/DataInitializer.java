@@ -42,7 +42,7 @@ public class DataInitializer {
           userRepository.save(admin);
 
           System.out.println("\n✅ Super admin user created:");
-          System.out.println("   Super Admin Email: " + defaultAdminEmail + " | Password: " + defaultAdminPassword + "\n");
+          System.out.println("   Super Admin Email: " + defaultAdminEmail + "\n");
         }
       } catch (Exception e) {
         e.printStackTrace();

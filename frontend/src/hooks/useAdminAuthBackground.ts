@@ -20,8 +20,8 @@ export const useAdminAuthBackground = (
   fallbackUrl: string = "/uploads/aglogin.jpg"
 ) => {
   const categoryKey = categories.join("|");
-  const resolvedCategories = categoryKey.split("|").filter(Boolean);
   const storageKey = `admin-auth-bg:${categoryKey}`;
+  const [cacheBuster] = useState(() => Date.now());
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(() => {
     try {
       const cached = window.localStorage.getItem(storageKey);
@@ -35,7 +35,7 @@ export const useAdminAuthBackground = (
     let mounted = true;
 
     const loadBackground = async () => {
-      for (const category of resolvedCategories) {
+      for (const category of categoryKey.split("|").filter(Boolean)) {
         try {
           const media = await fetchImagesByCategory(category);
           const latest = pickLatestImage(media);
@@ -46,10 +46,12 @@ export const useAdminAuthBackground = (
             try {
               window.localStorage.setItem(storageKey, normalized);
             } catch {
+              return;
             }
             return;
           }
         } catch {
+          continue;
         }
       }
 
@@ -58,6 +60,7 @@ export const useAdminAuthBackground = (
         try {
           window.localStorage.removeItem(storageKey);
         } catch {
+          return;
         }
       }
     };
@@ -76,7 +79,7 @@ export const useAdminAuthBackground = (
 
     const separator = backgroundUrl.includes("?") ? "&" : "?";
     return {
-      backgroundImage: `url(${backgroundUrl}${separator}v=${Date.now()})`,
+      backgroundImage: `url(${backgroundUrl}${separator}v=${cacheBuster})`,
     };
-  }, [backgroundUrl]);
+  }, [backgroundUrl, cacheBuster]);
 };
